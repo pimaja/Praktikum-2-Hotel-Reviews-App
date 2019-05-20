@@ -4,7 +4,7 @@ class StartController extends BaseController
 {
 	public function index()
 	{
-		$ls = new SmjestajService();
+		$ss = new SmjestajService();
 
 		// Popuni template potrebnim podacima
 		$this->registry->template->title = 'Nađi svoj smještaj!';
