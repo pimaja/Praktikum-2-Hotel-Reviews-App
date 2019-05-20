@@ -12,6 +12,21 @@ class StartController extends BaseController
         $this->registry->template->show( 'start_index' );
 	}
 
+	public function ulogiraj_registiraj()
+	{
+		if(isset($_POST['ulogiraj']))
+		{
+			$this->registry->template->title = 'Login';
+			$this->registry->template->show( 'login' );
+		}
+		if(isset($_POST['registriraj']))
+		{
+			$this->registry->template->title = 'Registriraj se';
+			$this->registry->template->show( 'register' );
+		}
+
+	}
+
 };
 
 ?>
