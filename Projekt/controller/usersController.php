@@ -80,15 +80,32 @@ class UsersController extends BaseController
 		}
 		if(isset($_POST['sort']))
 		{
+			$ss3 = new SmjestajService();
 			$N = count($_POST['sort']);
+			$polje_polja_soba= array();
+			$polje_polja_hotela= array();
 			echo "Sortira se po: ";
 			for($i=0; $i < $N; $i++)
 	    {
 	      	echo $_POST['sort'][$i] . " ";
-	    }
+					if($_POST['sort'][$i]==='udaljenost_od_centra' || $_POST['sort'][$i]==='ocjena' || $_POST['sort'][$i]==='broj_zvjezdica')
+					{
+							$polje_hotela = $ss3->getHotelsByNameOrderBy($_SESSION['ime_grada'], $_POST['sort'][$i]);
+							array_push($polje_polja_hotela, $polje_hotela);
+					}
+					else {
+						$polje_soba =$ss3->getRoomsByNameOrderBy($_SESSION['ime_grada'], $_POST['sort'][$i]);
+						 array_push($polje_polja_soba, $polje_soba);
+					}
+			}
+			$this->registry->template->hoteli = $polje_polja_hotela;
+			$this->registry->template->sobe = $polje_polja_soba;
+			//$this->registry->template->kriteriji = $_POST['sort'];
+			$this->registry->template->title = 'Sortiraj i filtriraj!';
+			$this->registry->template->show( 'sortirano_filtrirano' );
 			echo '<br>';
-			$ss3 = new SmjestajService();
-			$ss3->obradiSort($_SESSION['ime_grada'], $_POST['sort']);
+
+			//$ss3->obradiSort($_SESSION['ime_grada'], $_POST['sort']);
 		}
 	}
 

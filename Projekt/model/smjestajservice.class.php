@@ -31,6 +31,130 @@ class SmjestajService
 		}
 		catch( PDOException $e ) { exit( 'PDO error ' . $e->getMessage() ); }
 	}
+		function getHotelIdsByName( $ime_grada)
+	{
+		try
+		{
+			$db = DB::getConnection();
+			$st = $db->prepare( 'SELECT id FROM projekt_hoteli WHERE ime_grada=:ime_grada' );
+			$st->execute(array('ime_grada' => $ime_grada));
+		}
+		catch( PDOException $e ) { exit( 'PDO error ' . $e->getMessage() ); }
+
+		$arr = array();
+		while( $row = $st->fetch() )
+		{
+			$arr[] = $row['id'];
+		}
+
+		return $arr;
+	}
+
+	function getHotelNameById( $id)
+	{
+		try
+		{
+			$db = DB::getConnection();
+			$st = $db->prepare( 'SELECT ime_hotela FROM projekt_hoteli WHERE id=:id' );
+			$st->execute(array('id' => $id));
+		}
+		catch( PDOException $e ) { exit( 'PDO error ' . $e->getMessage() ); }
+
+		$row = $st->fetch();
+		if( $row === false )
+			return null;
+
+		return $row['ime_hotela'];
+	}
+
+	function getRoomsByNameOrderBy($ime_grada, $kriterij)
+	{
+		try
+		{
+			$db = DB::getConnection();
+			if($kriterij === 'broj_osoba')
+			{
+				echo "uslo";
+				$st = $db->prepare( 'SELECT * FROM projekt_sobe ORDER BY broj_osoba' );
+			}
+			if($kriterij === 'cijena_po_osobi')
+			{
+				echo "uslo1";
+				$st = $db->prepare( 'SELECT * FROM projekt_sobe ORDER BY cijena_po_osobi' );
+			}
+			$st->execute();
+		}
+		catch( PDOException $e ) { exit( 'PDO error ' . $e->getMessage() ); }
+
+		$ids = $this->getHotelIdsByName( $ime_grada);
+		$arr = array();
+
+		while( $row = $st->fetch() )
+		{
+			if(in_array($row['id'], $ids))
+			{
+				$ime_hotela = $this->getHotelNameById( $row['id']);
+				$arr[] = new Soba($row['id'], $ime_hotela, $row['broj_osoba'], $row['tip_kreveta'], $row['vlastita_kupaonica'],
+													$row['cijena_po_osobi']);
+			}
+		}
+
+
+		return $arr;
+	}
+
+	/*function getRoomsByNameOrderBy( $ime_grada, $kriterij )
+	{
+		$arr = array();
+			$ids = $this->getHotelIdsByNameOrderBy($ime_grada, $kriterij);
+			foreach ($ids as $id)
+			{
+				try
+				{
+					$db = DB::getConnection();
+					$st = $db->prepare( 'SELECT * FROM projekt_sobe WHERE id=:id' );
+					$st->execute(array('id' => $id));
+				}
+					catch( PDOException $e ) { exit( 'PDO error ' . $e->getMessage() ); }
+			}
+
+				$ime_hotela = $this->getHotelNameById( $id);
+
+				while( $row = $st->fetch() )
+				{
+					$arr[] = new Soba($row['id'], $ime_hotela, $row['broj_osoba'], $row['tip_kreveta'], $row['vlastita_kupaonica'],
+															$row['cijena_po_osobi']);
+				}
+
+
+		return $arr;
+
+	}*/
+
+	function getHotelsByNameOrderBy( $ime_grada, $kriterij )
+	{
+		try
+		{
+			$db = DB::getConnection();
+			if($kriterij === 'udaljenost_od_centra')
+				$st = $db->prepare( 'SELECT * FROM projekt_hoteli WHERE ime_grada=:ime_grada ORDER BY udaljenost_od_centra' );
+			if($kriterij === 'ocjena')
+				$st = $db->prepare( 'SELECT * FROM projekt_hoteli WHERE ime_grada=:ime_grada ORDER BY ocjena' );
+			if($kriterij === 'broj_zvjezdica')
+				$st = $db->prepare( 'SELECT * FROM projekt_hoteli WHERE ime_grada=:ime_grada ORDER BY broj_zvjezdica' );
+			$st->execute(array('ime_grada' => $ime_grada));
+		}
+		catch( PDOException $e ) { exit( 'PDO error ' . $e->getMessage() ); }
+
+		$arr = array();
+		while( $row = $st->fetch() )
+		{
+			$arr[] = new Hotel( $row['id'], $row['ime_grada'], $row['ime_hotela'], $row['adresa_hotela'], $row['udaljenost_od_centra'],
+														$row['ocjena'], $row['broj_zvjezdica'] );
+		}
+
+		return $arr;
+	}
 
 	function obradiSort($ime_grada, $nizKriterija)
 	{
