@@ -63,7 +63,10 @@ class UsersController extends BaseController
 		}
 		if(isset($_POST['odabir']))
 		{
-			$ime_grada = $_POST['odabir'];
+			$_SESSION['ime_grada'] = $_POST['odabir'];
+			$this->registry->template->title = 'Sortiraj i filtriraj!';
+			$this->registry->template->show( 'sortiraj_filtriraj' );
+			//exit();
 			//sad treba omogućiti da pretrazuje hotele po filerima(udaljenost, vlastita soba...) ili sortira(po cijeni...)
 		}
 	}
