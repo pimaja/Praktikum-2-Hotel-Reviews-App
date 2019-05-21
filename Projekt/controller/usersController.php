@@ -31,7 +31,7 @@ class UsersController extends BaseController
 			{
 				session_start();
 				$secret_word = 'racunarski praktikum 2!!!';
-				$_SESSION['login'] = $_POST['ime'] . $_POST['prezime'] . ',' . md5( $_POST['ime'] . $secret_word );;
+				$_SESSION['login'] = $_POST['ime'] . ','. $_POST['prezime'] . ',' . md5( $_POST['ime'] . $secret_word );;
 				header( 'Location: ' . __SITE_URL . '/index.php?rt=users/odabir');
 				exit();
 			}
@@ -47,7 +47,7 @@ class UsersController extends BaseController
 			$ss2->dodajUsera($_POST['ime'], $_POST['prezime'], $_POST['pass']);
 			session_start();
 			$secret_word = 'racunarski praktikum 2!!!';
-			$_SESSION['login'] = $_POST['ime'] . $_POST['prezime'] . ',' . md5( $_POST['ime'] . $secret_word );;
+			$_SESSION['login'] = $_POST['ime'] . ',' . $_POST['prezime'] . ',' . md5( $_POST['ime'] . $secret_word );;
 			header( 'Location: ' . __SITE_URL . '/index.php?rt=users/odabir');
 			exit();
 		}
@@ -68,6 +68,27 @@ class UsersController extends BaseController
 			$this->registry->template->show( 'sortiraj_filtriraj' );
 			//exit();
 			//sad treba omogućiti da pretrazuje hotele po filerima(udaljenost, vlastita soba...) ili sortira(po cijeni...)
+		}
+	}
+
+	public function check_sort_filt()
+	{
+		if(isset($_POST['odlogiraj']))
+		{
+			$this->odlogiraj();
+			exit();
+		}
+		if(isset($_POST['sort']))
+		{
+			$N = count($_POST['sort']);
+			echo "Sortira se po: ";
+			for($i=0; $i < $N; $i++)
+	    {
+	      	echo $_POST['sort'][$i] . " ";
+	    }
+			echo '<br>';
+			$ss3 = new SmjestajService();
+			$ss3->obradiSort($_SESSION['ime_grada'], $_POST['sort']);
 		}
 	}
 
