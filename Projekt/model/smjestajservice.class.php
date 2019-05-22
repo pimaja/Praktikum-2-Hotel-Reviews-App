@@ -91,10 +91,10 @@ class SmjestajService
 
 		while( $row = $st->fetch() )
 		{
-			if(in_array($row['id'], $ids))
+			if(in_array($row['id_hotela'], $ids)) // greška!!
 			{
-				$ime_hotela = $this->getHotelNameById( $row['id']);
-				$arr[] = new Soba($row['id'], $ime_hotela, $row['broj_osoba'], $row['tip_kreveta'], $row['vlastita_kupaonica'],
+				$ime_hotela = $this->getHotelNameById( $row['id_hotela']);
+				$arr[] = new Soba($ime_hotela, $row['id'], $row['id_hotela'], $row['broj_osoba'], $row['tip_kreveta'], $row['vlastita_kupaonica'],
 													$row['cijena_po_osobi']);
 			}
 		}
@@ -102,34 +102,6 @@ class SmjestajService
 
 		return $arr;
 	}
-
-	/*function getRoomsByNameOrderBy( $ime_grada, $kriterij )
-	{
-		$arr = array();
-			$ids = $this->getHotelIdsByNameOrderBy($ime_grada, $kriterij);
-			foreach ($ids as $id)
-			{
-				try
-				{
-					$db = DB::getConnection();
-					$st = $db->prepare( 'SELECT * FROM projekt_sobe WHERE id=:id' );
-					$st->execute(array('id' => $id));
-				}
-					catch( PDOException $e ) { exit( 'PDO error ' . $e->getMessage() ); }
-			}
-
-				$ime_hotela = $this->getHotelNameById( $id);
-
-				while( $row = $st->fetch() )
-				{
-					$arr[] = new Soba($row['id'], $ime_hotela, $row['broj_osoba'], $row['tip_kreveta'], $row['vlastita_kupaonica'],
-															$row['cijena_po_osobi']);
-				}
-
-
-		return $arr;
-
-	}*/
 
 	function getHotelsByNameOrderBy( $ime_grada, $kriterij )
 	{
@@ -156,7 +128,47 @@ class SmjestajService
 		return $arr;
 	}
 
-	function obradiSort($ime_grada, $nizKriterija)
+	function applyFilterCijena( & $polje_polja_soba, $cijena)
+	{
+		foreach($polje_polja_soba as $kljuc => $polje)
+			foreach($polje as $key => $soba)
+				if($soba->cijena_po_osobi > $cijena)
+					unset($polje_polja_soba[$kljuc][$key]);
+	}
+
+	function applyFilterUdaljenost( & $polje_polja_hotela, $udaljenost)
+	{
+		foreach($polje_polja_hotela as $kljuc => $polje)
+			foreach($polje as $key => $hotel)
+				if($hotel->udaljenost_od_centra > $udaljenost)
+					unset($polje_polja_hotela[$kljuc][$key]);
+	}
+
+	function applyFilterOsobe( & $polje_polja_soba, $osobe)
+	{
+		foreach($polje_polja_soba as $kljuc => $polje)
+			foreach($polje as $key => $soba)
+				if($soba->broj_osoba != $osobe)
+					unset($polje_polja_soba[$kljuc][$key]);
+	}
+
+	function applyFilterOcjena( & $polje_polja_hotela, $ocjena)
+	{
+		foreach($polje_polja_hotela as $kljuc => $polje)
+			foreach($polje as $key => $hotel)
+				if($hotel->ocjena < $ocjena)
+					unset($polje_polja_hotela[$kljuc][$key]);
+	}
+
+	function applyFilterZvjezdice( & $polje_polja_hotela, $zvjezdice)
+	{
+		foreach($polje_polja_hotela as $kljuc => $polje)
+			foreach($polje as $key => $hotel)
+				if($hotel->broj_zvjezdica < $zvjezdice)
+					unset($polje_polja_hotela[$kljuc][$key]);
+	}
+
+	/*function obradiSort($ime_grada, $nizKriterija)
 	{
 		try
 		{
@@ -299,7 +311,7 @@ class SmjestajService
 			}
 		}
 		catch( PDOException $e ) { exit( 'PDO error ' . $e->getMessage() ); }
-	}
+	}*/
 };
 
 ?>

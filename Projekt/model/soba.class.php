@@ -2,12 +2,13 @@
 
 class Soba
 {
-	protected $id, $ime_hotela, $broj_osoba, $tip_kreveta, $vlastita_kupaonica, $cijena_po_osobi;
+	protected $ime_hotela, $id, $id_hotela, $broj_osoba, $tip_kreveta, $vlastita_kupaonica, $cijena_po_osobi;
 
-	function __construct( $id, $ime_hotela, $broj_osoba, $tip_kreveta, $vlastita_kupaonica, $cijena_po_osobi )
+	function __construct( $ime_hotela, $id, $id_hotela, $broj_osoba, $tip_kreveta, $vlastita_kupaonica, $cijena_po_osobi )
 	{
+		$this->ime_hotela = $ime_hotela;
 		$this->id = $id;
-    $this->ime_hotela = $ime_hotela;
+    $this->id_hotela = $id_hotela;
 		$this->broj_osoba = $broj_osoba;
 		$this->tip_kreveta = $tip_kreveta;
 		$this->vlastita_kupaonica = $vlastita_kupaonica;
