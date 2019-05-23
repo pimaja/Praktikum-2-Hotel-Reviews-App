@@ -18,6 +18,7 @@
 <br />
 <input type="checkbox" name="filter[]" value = "ocjena"> Minimalna ocjena <input type="text" name="ocjena"> (1-10) <br />
 <input type="checkbox" name="filter[]" value = "broj_zvjezdica"> Minimalni broj zvjezdica <input type="text" name="zvjezdice"> (1-5) <br />
+<input type="checkbox" name="filter[]" value = "vlastita_kupaonica"> Obvezna kupaonica<br />
 <br />
 <button type="submit" name="button">Dalje</button><br /><br />
 <button type="submit" name="odlogiraj">Odlogiraj se</button>

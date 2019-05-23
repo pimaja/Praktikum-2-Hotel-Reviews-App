@@ -107,17 +107,26 @@ class UsersController extends BaseController
 				for($i=0; $i < $M; $i++)
 				{
 					if($_POST['filter'][$i] === 'cijena_po_osobi' && isset($_POST['cijena']))
-						$ss3->applyFilterCijena($polje_polja_soba, $_POST['cijena']);
+						$ss3->applyFilterCijena($polje_polja_hotela, $polje_polja_soba, $_POST['cijena']);
 					if($_POST['filter'][$i] === 'udaljenost_od_centra' && isset($_POST['udaljenost']))
-						$ss3->applyFilterUdaljenost($polje_polja_hotela, $_POST['udaljenost']);
+						$ss3->applyFilterUdaljenost($polje_polja_hotela, $polje_polja_soba, $_POST['udaljenost']);
 					if($_POST['filter'][$i] === 'broj_osoba' && isset($_POST['osobe']))
-						$ss3->applyFilterOsobe($polje_polja_soba, $_POST['osobe']);
-					/*if($_POST['filter'][$i] === 'tip_kreveta' && (isset($_POST['bracni']) || isset($_POST['odvojeni']) || isset($_POST['na_kat']))
-						$ss3->applyFilterKreveti($polje_polja_soba, $_POST['osobe']);*/
+						$ss3->applyFilterOsobe($polje_polja_hotela, $polje_polja_soba, $_POST['osobe']);
+					if($_POST['filter'][$i] === 'tip_kreveta' && (isset($_POST['bracni']) || isset($_POST['odvojeni']) || isset($_POST['na_kat'])))
+					{
+						$nizKreveti = array();
+						if($_POST['bracni'] !== '' && $_POST['bracni'] !== '0') array_push($nizKreveti, $_POST['bracni'].' x bracni');
+						if($_POST['odvojeni'] !== '' && $_POST['odvojeni'] !== '0') array_push($nizKreveti, $_POST['odvojeni'].' x odvojeni');
+						if($_POST['na_kat'] !== '' && $_POST['na_kat'] !== '0') array_push($nizKreveti, $_POST['na_kat'].' x na kat');
+						foreach($nizKreveti as $var) echo $var.' ';
+						$ss3->applyFilterKreveti($polje_polja_hotela, $polje_polja_soba, $nizKreveti);
+					}
 					if($_POST['filter'][$i] === 'ocjena' && isset($_POST['ocjena']))
-						$ss3->applyFilterOcjena($polje_polja_hotela, $_POST['ocjena']);
+						$ss3->applyFilterOcjena($polje_polja_hotela, $polje_polja_soba, $_POST['ocjena']);
 					if($_POST['filter'][$i] === 'broj_zvjezdica' && isset($_POST['zvjezdice']))
-						$ss3->applyFilterZvjezdice($polje_polja_hotela, $_POST['zvjezdice']);
+						$ss3->applyFilterZvjezdice($polje_polja_hotela, $polje_polja_soba, $_POST['zvjezdice']);
+					if($_POST['filter'][$i] === 'vlastita_kupaonica')
+						$ss3->applyFilterKupaonica($polje_polja_hotela, $polje_polja_soba);
 				}
 			}
 			$this->registry->template->hoteli = $polje_polja_hotela;
