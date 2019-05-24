@@ -73,15 +73,9 @@ class SmjestajService
 		{
 			$db = DB::getConnection();
 			if($kriterij === 'broj_osoba')
-			{
-				echo "uslo";
 				$st = $db->prepare( 'SELECT * FROM projekt_sobe ORDER BY broj_osoba' );
-			}
 			if($kriterij === 'cijena_po_osobi')
-			{
-				echo "uslo1";
 				$st = $db->prepare( 'SELECT * FROM projekt_sobe ORDER BY cijena_po_osobi' );
-			}
 			$st->execute();
 		}
 		catch( PDOException $e ) { exit( 'PDO error ' . $e->getMessage() ); }
@@ -91,233 +85,196 @@ class SmjestajService
 
 		while( $row = $st->fetch() )
 		{
-			if(in_array($row['id_hotela'], $ids)) // greška!!
+			if(in_array($row['id_hotela'], $ids))
 			{
 				$ime_hotela = $this->getHotelNameById( $row['id_hotela']);
 				$arr[] = new Soba($ime_hotela, $row['id'], $row['id_hotela'], $row['broj_osoba'], $row['tip_kreveta'], $row['vlastita_kupaonica'],
 													$row['cijena_po_osobi']);
 			}
 		}
-
-
 		return $arr;
 	}
 
 	function getHotelsByNameOrderBy( $ime_grada, $kriterij )
 	{
-		try
-		{
-			$db = DB::getConnection();
-			if($kriterij === 'udaljenost_od_centra')
-				$st = $db->prepare( 'SELECT * FROM projekt_hoteli WHERE ime_grada=:ime_grada ORDER BY udaljenost_od_centra' );
-			if($kriterij === 'ocjena')
-				$st = $db->prepare( 'SELECT * FROM projekt_hoteli WHERE ime_grada=:ime_grada ORDER BY ocjena' );
-			if($kriterij === 'broj_zvjezdica')
-				$st = $db->prepare( 'SELECT * FROM projekt_hoteli WHERE ime_grada=:ime_grada ORDER BY broj_zvjezdica' );
-			$st->execute(array('ime_grada' => $ime_grada));
-		}
-		catch( PDOException $e ) { exit( 'PDO error ' . $e->getMessage() ); }
-
-		$arr = array();
-		while( $row = $st->fetch() )
-		{
-			$arr[] = new Hotel( $row['id'], $row['ime_grada'], $row['ime_hotela'], $row['adresa_hotela'], $row['udaljenost_od_centra'],
-														$row['ocjena'], $row['broj_zvjezdica'] );
-		}
-
-		return $arr;
-	}
-
-	function applyFilterCijena(  & $polje_polja_hotela, & $polje_polja_soba, $cijena)
-	{
-		foreach($polje_polja_soba as $kljuc => $polje)
-			foreach($polje as $key => $soba)
-				if($soba->cijena_po_osobi > $cijena)
-					unset($polje_polja_soba[$kljuc][$key]);
-		foreach($polje_polja_hotela as $kljuc => $polje)
-			foreach($polje as $key => $hotel)
+			if($kriterij === 'udaljenost_od_centra' || $kriterij === 'ocjena' || $kriterij === 'broj_zvjezdica')
 			{
 				try
 				{
 					$db = DB::getConnection();
-					$st = $db->prepare( 'SELECT cijena_po_osobi FROM projekt_sobe WHERE id_hotela=:id_hotela');
-					$st->execute(array('id_hotela' => $hotel->id));
-				}
-					catch( PDOException $e ) { exit( 'PDO error ' . $e->getMessage() ); }
-					$test = 0;
-					while($row = $st->fetch())
-						if($row['cijena_po_osobi'] > $cijena) $test = 1;
-					if(!$test) unset($polje_polja_hotela[$kljuc][$key]);
+					if($kriterij === 'udaljenost_od_centra')
+						$st = $db->prepare( 'SELECT * FROM projekt_hoteli WHERE ime_grada=:ime_grada ORDER BY udaljenost_od_centra' );
+					if($kriterij === 'ocjena')
+						$st = $db->prepare( 'SELECT * FROM projekt_hoteli WHERE ime_grada=:ime_grada ORDER BY ocjena' );
+					if($kriterij === 'broj_zvjezdica')
+						$st = $db->prepare( 'SELECT * FROM projekt_hoteli WHERE ime_grada=:ime_grada ORDER BY broj_zvjezdica' );
+					$st->execute(array('ime_grada' => $ime_grada));
 			}
+			catch( PDOException $e ) { exit( 'PDO error ' . $e->getMessage() ); }
+
+			$arr = array();
+			while( $row = $st->fetch() )
+			{
+				try
+				{
+					$db = DB::getConnection();
+					$st2 = $db->prepare( 'SELECT * FROM projekt_sobe WHERE id_hotela=:id_hotela' );
+					$st2->execute(array('id_hotela' => $row['id']));
+				}
+				catch( PDOException $e ) { exit( 'PDO error ' . $e->getMessage() ); }
+
+				$arr2 = array();
+				while ($row2 = $st2->fetch()) $arr2[] = new Soba($row['ime_hotela'], $row2['id'], $row2['id_hotela'], $row2['broj_osoba'], $row2['tip_kreveta'],
+																												$row2['vlastita_kupaonica'], $row2['cijena_po_osobi']);
+				$arr[] = new Hotel( $row['id'], $row['ime_grada'], $row['ime_hotela'], $row['adresa_hotela'], $row['udaljenost_od_centra'],
+														$row['ocjena'], $row['broj_zvjezdica'], $arr2 );
+			}
+		}
+		else {
+			$arr = array();
+			$sobe = $this->getRoomsByNameOrderBy($ime_grada, $kriterij);
+			foreach($sobe as $var)
+			{
+				$db = DB::getConnection();
+			  $st = $db->prepare( 'SELECT * FROM projekt_hoteli WHERE id=:id_hotela' );
+				$st->execute(array('id_hotela' => $var->id_hotela));
+				while( $row = $st->fetch() )
+				{
+					try
+					{
+						$db = DB::getConnection();
+						if($kriterij === 'broj_osoba')
+							$st2 = $db->prepare( 'SELECT * FROM projekt_sobe WHERE id_hotela=:id_hotela ORDER BY broj_osoba' );
+					  if($kriterij === 'cijena_po_osobi')
+							$st2 = $db->prepare( 'SELECT * FROM projekt_sobe WHERE id_hotela=:id_hotela ORDER BY cijena_po_osobi' );
+						$st2->execute(array('id_hotela' => $row['id']));
+					}
+					catch( PDOException $e ) { exit( 'PDO error ' . $e->getMessage() ); }
+
+					$arr2 = array();
+					while ($row2 = $st2->fetch()) $arr2[] = new Soba($row['ime_hotela'], $row2['id'], $row2['id_hotela'], $row2['broj_osoba'], $row2['tip_kreveta'],
+																														$row2['vlastita_kupaonica'], $row2['cijena_po_osobi']);
+					$arr[] = new Hotel( $row['id'], $row['ime_grada'], $row['ime_hotela'], $row['adresa_hotela'], $row['udaljenost_od_centra'],
+																$row['ocjena'], $row['broj_zvjezdica'], $arr2 );
+				}
+			}
+		}
+		return $arr;
+
 	}
 
-	function applyFilterUdaljenost( & $polje_polja_hotela, & $polje_polja_soba, $udaljenost)
+	function applyFilterCijena(  & $polje_polja_hotela, $cijena)
+	{
+		foreach($polje_polja_hotela as $kljuc => $polje)
+		{
+			foreach($polje as $key => $hotel)
+			{
+				$test = 0;
+				foreach($hotel->sobe as $soba)
+						if($soba->cijena_po_osobi <= $cijena)
+						{
+							$test = 1;
+							break;
+						}
+				if(!$test) unset($polje_polja_hotela[$kljuc][$key]);
+			}
+		}
+	}
+
+	function applyFilterUdaljenost( & $polje_polja_hotela, $udaljenost)
 	{
 		foreach($polje_polja_hotela as $kljuc => $polje)
 			foreach($polje as $key => $hotel)
 				if($hotel->udaljenost_od_centra > $udaljenost)
 					unset($polje_polja_hotela[$kljuc][$key]);
-		foreach($polje_polja_soba as $kljuc => $polje)
-			foreach($polje as $key => $soba)
-			{
-				try
-				{
-					$db = DB::getConnection();
-					$st = $db->prepare( 'SELECT udaljenost_od_centra FROM projekt_hoteli WHERE ime_hotela=:ime_hotela');
-					$st->execute(array('ime_hotela' => $soba->ime_hotela));
-				}
-					catch( PDOException $e ) { exit( 'PDO error ' . $e->getMessage() ); }
-					$row = $st->fetch();
-					if($row['udaljenost_od_centra'] > $udaljenost)
-						unset($polje_polja_soba[$kljuc][$key]);
-			}
 	}
 
-	function applyFilterOsobe(  & $polje_polja_hotela, & $polje_polja_soba, $osobe)
+	function applyFilterOsobe(  & $polje_polja_hotela, $osobe)
 	{
-		foreach($polje_polja_soba as $kljuc => $polje)
-			foreach($polje as $key => $soba)
-				if($soba->broj_osoba != $osobe)
-					unset($polje_polja_soba[$kljuc][$key]);
 		foreach($polje_polja_hotela as $kljuc => $polje)
+		{
 			foreach($polje as $key => $hotel)
 			{
-				try
-				{
-					$db = DB::getConnection();
-					$st = $db->prepare( 'SELECT broj_osoba FROM projekt_sobe WHERE id_hotela=:id_hotela');
-					$st->execute(array('id_hotela' => $hotel->id));
-				}
-					catch( PDOException $e ) { exit( 'PDO error ' . $e->getMessage() ); }
-					$test = 0;
-						while($row = $st->fetch())
-							if($row['broj_osoba'] === $osobe) $test = 1;
-						if(!$test) unset($polje_polja_hotela[$kljuc][$key]);
+				$test = 0;
+				foreach($hotel->sobe as $soba)
+						if($soba->broj_osoba === $osobe)
+						{
+							$test = 1;
+							break;
+						}
+				if(!$test) unset($polje_polja_hotela[$kljuc][$key]);
 			}
+		}
 	}
 
-	function applyFilterOcjena( & $polje_polja_hotela, & $polje_polja_soba, $ocjena)
+	function applyFilterOcjena( & $polje_polja_hotela, $ocjena)
 	{
 		foreach($polje_polja_hotela as $kljuc => $polje)
 			foreach($polje as $key => $hotel)
 				if($hotel->ocjena < $ocjena)
 					unset($polje_polja_hotela[$kljuc][$key]);
-		foreach($polje_polja_soba as $kljuc => $polje)
-			foreach($polje as $key => $soba)
-			{
-				try
-				{
-					$db = DB::getConnection();
-					$st = $db->prepare( 'SELECT ocjena FROM projekt_hoteli WHERE ime_hotela=:ime_hotela');
-					$st->execute(array('ime_hotela' => $soba->ime_hotela));
-				}
-					catch( PDOException $e ) { exit( 'PDO error ' . $e->getMessage() ); }
-					$row = $st->fetch();
-					if($row['ocjena'] < $ocjena)
-						unset($polje_polja_soba[$kljuc][$key]);
-			}
 	}
 
-	function applyFilterZvjezdice( & $polje_polja_hotela, & $polje_polja_soba, $zvjezdice)
+	function applyFilterZvjezdice( & $polje_polja_hotela, $zvjezdice)
 	{
 		foreach($polje_polja_hotela as $kljuc => $polje)
 			foreach($polje as $key => $hotel)
 				if($hotel->broj_zvjezdica < $zvjezdice)
 					unset($polje_polja_hotela[$kljuc][$key]);
-		foreach($polje_polja_soba as $kljuc => $polje)
-			foreach($polje as $key => $soba)
-			{
-				try
-				{
-					$db = DB::getConnection();
-					$st = $db->prepare( 'SELECT broj_zvjezdica FROM projekt_hoteli WHERE ime_hotela=:ime_hotela');
-					$st->execute(array('ime_hotela' => $soba->ime_hotela));
-				}
-				catch( PDOException $e ) { exit( 'PDO error ' . $e->getMessage() ); }
-				$row = $st->fetch();
-				if($row['broj_zvjezdica'] < $zvjezdice)
-					unset($polje_polja_soba[$kljuc][$key]);
-			}
 	}
 
-	function applyFilterKupaonica(  & $polje_polja_hotela, & $polje_polja_soba)
+	function applyFilterKupaonica(  & $polje_polja_hotela)
 	{
-		foreach($polje_polja_soba as $kljuc => $polje)
-			foreach($polje as $key => $soba)
-				if($soba->vlastita_kupaonica !== '1')
-					unset($polje_polja_soba[$kljuc][$key]);
 		foreach($polje_polja_hotela as $kljuc => $polje)
+		{
 			foreach($polje as $key => $hotel)
 			{
-				try
-				{
-					$db = DB::getConnection();
-					$st = $db->prepare( 'SELECT vlastita_kupaonica FROM projekt_sobe WHERE id_hotela=:id_hotela');
-					$st->execute(array('id_hotela' => $hotel->id));
-				}
-					catch( PDOException $e ) { exit( 'PDO error ' . $e->getMessage() ); }
-					$test = 0;
-					while($row = $st->fetch())
-						if($row['vlastita_kupaonica'] === '1') $test = 1;
-					if(!$test) unset($polje_polja_hotela[$kljuc][$key]);
-				}
+				$test = 0;
+				foreach($hotel->sobe as $soba)
+						if($soba->vlastita_kupaonica === '1')
+						{
+							$test = 1;
+							break;
+						}
+				if(!$test) unset($polje_polja_hotela[$kljuc][$key]);
+			}
+		}
 	}
 
-	function applyFilterKreveti(  & $polje_polja_hotela, & $polje_polja_soba, $nizKreveti)
+	function applyFilterKreveti(  & $polje_polja_hotela, $nizKreveti)
 	{
-			foreach($polje_polja_soba as $kljuc => $polje)
-				foreach($polje as $key => $soba)
+
+		foreach($polje_polja_hotela as $kljuc => $polje)
+		{
+			foreach($polje as $key => $hotel)
+			{
+				$test = 0;
+				foreach($hotel->sobe as $soba)
 				{
 					$string = $soba->tip_kreveta;
 					$tipovi = explode(", " , $string);
-					if(count($nizKreveti) !== count($tipovi))
-						unset($polje_polja_soba[$kljuc][$key]);
-					else
+					$nastavak = 0;
+					if(count($nizKreveti) === count($tipovi))
 						foreach($tipovi as $var)
+						{
 							if(!in_array($var, $nizKreveti))
 							{
-								unset($polje_polja_soba[$kljuc][$key]);
+								$nastavak = 1;
 								break;
 							}
-				}
-			foreach($polje_polja_hotela as $kljuc => $polje)
-				foreach($polje as $key => $hotel)
-				{
-					try
-					{
-						$db = DB::getConnection();
-						$st = $db->prepare( 'SELECT tip_kreveta FROM projekt_sobe WHERE id_hotela=:id_hotela');
-						$st->execute(array('id_hotela' => $hotel->id));
-					}
-						catch( PDOException $e ) { exit( 'PDO error ' . $e->getMessage() ); }
-						$test = 0;
-						while($row = $st->fetch())
-						{
-
-							$string = $row['tip_kreveta'];
-							$tipovi = explode(", " , $string);
-							$nastavak = 0;
-							if(count($nizKreveti) === count($tipovi))
-							{
-								$nastavak = 0;
-								foreach($tipovi as $var)
-									if(!in_array($var, $nizKreveti))
-									{
-										$nastavak = 1;
-										break;
-									}
-							}
-							if($nastavak === 0)
-							{
-								$test = 1;
-								break;
-							} //Taj redak u bazi valja
 						}
-
-						if(!$test) unset($polje_polja_hotela[$kljuc][$key]);
+					else $nastavak = 1;
+					if($nastavak === 0)
+					{
+						$test = 1;
+						break;
 					}
-
+				}
+				if(!$test) unset($polje_polja_hotela[$kljuc][$key]);
+			}
+		}
 	}
+
 
 	/*function obradiSort($ime_grada, $nizKriterija)
 	{

@@ -2,9 +2,9 @@
 
 class Hotel
 {
-	protected $id, $ime_grada, $ime_hotela, $adresa_hotela, $udaljenost_od_centra, $ocjena, $broj_zvjezdica;
+	protected $id, $ime_grada, $ime_hotela, $adresa_hotela, $udaljenost_od_centra, $ocjena, $broj_zvjezdica, $sobe;
 
-	function __construct( $id, $ime_grada, $ime_hotela, $adresa_hotela, $udaljenost_od_centra, $ocjena, $broj_zvjezdica )
+	function __construct( $id, $ime_grada, $ime_hotela, $adresa_hotela, $udaljenost_od_centra, $ocjena, $broj_zvjezdica, $sobe)
 	{
 		$this->id = $id;
     $this->ime_grada = $ime_grada;
@@ -13,6 +13,7 @@ class Hotel
 		$this->udaljenost_od_centra = $udaljenost_od_centra;
     $this->ocjena = $ocjena;
     $this->broj_zvjezdica= $broj_zvjezdica;
+		$this->sobe= $sobe;
 	}
 
 	function __get( $prop ) { return $this->$prop; }

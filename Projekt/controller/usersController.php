@@ -78,27 +78,23 @@ class UsersController extends BaseController
 			$this->odlogiraj();
 			exit();
 		}
+		//$polje_polja_soba= array();
+		$polje_polja_hotela= array();
+		//$soba_kriteriji= array();
+		$hotel_kriteriji= array();
+		$filtri = array();
 		if(isset($_POST['sort']))
 		{
 			$ss3 = new SmjestajService();
-			$polje_polja_soba= array();
-			$polje_polja_hotela= array();
+
 			if(isset($_POST['sort']))
 			{
 				$N = count($_POST['sort']);
-				echo "Sortira se po: ";
 				for($i=0; $i < $N; $i++)
 	    	{
-	      		echo $_POST['sort'][$i] . " ";
-						if($_POST['sort'][$i]==='udaljenost_od_centra' || $_POST['sort'][$i]==='ocjena' || $_POST['sort'][$i]==='broj_zvjezdica')
-						{
-								$polje_hotela = $ss3->getHotelsByNameOrderBy($_SESSION['ime_grada'], $_POST['sort'][$i]);
-								array_push($polje_polja_hotela, $polje_hotela);
-							}
-							else {
-								$polje_soba =$ss3->getRoomsByNameOrderBy($_SESSION['ime_grada'], $_POST['sort'][$i]);
-						 		array_push($polje_polja_soba, $polje_soba);
-						}
+						$polje_hotela = $ss3->getHotelsByNameOrderBy($_SESSION['ime_grada'], $_POST['sort'][$i]);
+						array_push($polje_polja_hotela, $polje_hotela);
+						array_push($hotel_kriteriji, $_POST['sort'][$i]);
 				}
 		}
 			if(isset($_POST['filter']))
@@ -107,31 +103,95 @@ class UsersController extends BaseController
 				for($i=0; $i < $M; $i++)
 				{
 					if($_POST['filter'][$i] === 'cijena_po_osobi' && isset($_POST['cijena']))
-						$ss3->applyFilterCijena($polje_polja_hotela, $polje_polja_soba, $_POST['cijena']);
+					{
+						$ss3->applyFilterCijena($polje_polja_hotela, $_POST['cijena']);
+						array_push($filtri, 'cijena po osobi po noćenju najviše: '.$_POST['cijena']);
+					}
 					if($_POST['filter'][$i] === 'udaljenost_od_centra' && isset($_POST['udaljenost']))
-						$ss3->applyFilterUdaljenost($polje_polja_hotela, $polje_polja_soba, $_POST['udaljenost']);
+					{
+						$ss3->applyFilterUdaljenost($polje_polja_hotela, $_POST['udaljenost']);
+						array_push($filtri, 'udaljenost od centra najviše: '.$_POST['udaljenost']);
+					}
 					if($_POST['filter'][$i] === 'broj_osoba' && isset($_POST['osobe']))
-						$ss3->applyFilterOsobe($polje_polja_hotela, $polje_polja_soba, $_POST['osobe']);
+					{
+						$ss3->applyFilterOsobe($polje_polja_hotela, $_POST['osobe']);
+						array_push($filtri, 'broj osoba: '.$_POST['osobe']);
+					}
 					if($_POST['filter'][$i] === 'tip_kreveta' && (isset($_POST['bracni']) || isset($_POST['odvojeni']) || isset($_POST['na_kat'])))
 					{
 						$nizKreveti = array();
 						if($_POST['bracni'] !== '' && $_POST['bracni'] !== '0') array_push($nizKreveti, $_POST['bracni'].' x bracni');
 						if($_POST['odvojeni'] !== '' && $_POST['odvojeni'] !== '0') array_push($nizKreveti, $_POST['odvojeni'].' x odvojeni');
 						if($_POST['na_kat'] !== '' && $_POST['na_kat'] !== '0') array_push($nizKreveti, $_POST['na_kat'].' x na kat');
-						foreach($nizKreveti as $var) echo $var.' ';
-						$ss3->applyFilterKreveti($polje_polja_hotela, $polje_polja_soba, $nizKreveti);
+						$string = ' ';
+						foreach($nizKreveti as $var) $string.= $var.' ';
+						$ss3->applyFilterKreveti($polje_polja_hotela, $nizKreveti);
+						array_push($filtri, 'tip kreveta: '.$string);
 					}
 					if($_POST['filter'][$i] === 'ocjena' && isset($_POST['ocjena']))
-						$ss3->applyFilterOcjena($polje_polja_hotela, $polje_polja_soba, $_POST['ocjena']);
+					{
+						$ss3->applyFilterOcjena($polje_polja_hotela, $_POST['ocjena']);
+						array_push($filtri, 'minimalna ocjena: '.$_POST['ocjena']);
+					}
 					if($_POST['filter'][$i] === 'broj_zvjezdica' && isset($_POST['zvjezdice']))
-						$ss3->applyFilterZvjezdice($polje_polja_hotela, $polje_polja_soba, $_POST['zvjezdice']);
+					{
+						$ss3->applyFilterZvjezdice($polje_polja_hotela, $_POST['zvjezdice']);
+						array_push($filtri, 'minimalni broj zvjezdica: '.$_POST['zvjezdice']);
+					}
 					if($_POST['filter'][$i] === 'vlastita_kupaonica')
-						$ss3->applyFilterKupaonica($polje_polja_hotela, $polje_polja_soba);
+					{
+						$ss3->applyFilterKupaonica($polje_polja_hotela);
+						array_push($filtri, 'obvezna kupaonica' );
+					}
 				}
 			}
+
+			$sort_cijene = array();
+			$sort_osobe = array();
+			$i=0;
+			$niz_id = array();
+			foreach($polje_polja_hotela as $polje_hotela)
+			{
+				if($hotel_kriteriji[$i] === 'cijena_po_osobi')
+				{
+					foreach($polje_hotela as $hotel)
+						array_push($niz_id, $hotel->id);
+					array_unique($niz_id);
+					foreach($polje_hotela as $hotel)
+					{
+						if(in_array($hotel->id, $niz_id))
+							foreach($hotel->sobe as $soba)
+							{
+								array_push($sort_cijene, $soba->cijena_po_osobi);
+								unset($niz_id[array_search($hotel->id, $niz_id)]);
+							}
+					}
+				}
+				if($hotel_kriteriji[$i] === 'broj_osoba')
+				{
+					foreach($polje_hotela as $hotel)
+						array_push($niz_id, $hotel->id);
+					array_unique($niz_id);
+					foreach($polje_hotela as $hotel)
+					{
+						if(in_array($hotel->id, $niz_id))
+							foreach($hotel->sobe as $soba)
+							{
+								array_push($sort_osobe, $soba->broj_osoba);
+								unset($niz_id[array_search($hotel->id, $niz_id)]);
+							}
+					}
+				}
+				$i++;
+			}
+			sort($sort_cijene); sort($sort_osobe);
 			$this->registry->template->hoteli = $polje_polja_hotela;
-			$this->registry->template->sobe = $polje_polja_soba;
-			//$this->registry->template->kriteriji = $_POST['sort'];
+			//$this->registry->template->sobe = $polje_polja_soba;
+			//$this->registry->template->soba_kriteriji = $soba_kriteriji;
+			$this->registry->template->hotel_kriteriji = $hotel_kriteriji;
+			$this->registry->template->filtri = $filtri;
+			$this->registry->template->sort_cijene = $sort_cijene;
+			$this->registry->template->sort_osobe = $sort_osobe;
 			$this->registry->template->title = 'Sortiraj i filtriraj!';
 			$this->registry->template->show( 'sortirano_filtrirano' );
 			echo '<br>';
