@@ -3,7 +3,7 @@
 	<form method="post" action="<?php echo __SITE_URL; ?>/index.php?rt=users/check_login">
 	Ime: <input type="text" name="ime" /><br />
   Prezime: <input type="text" name="prezime" /><br />
-	Password: <input type="text" name="pass"><br />
+	Password: <input type="password" name="pass"><br />
 	<button type="submit">Ulogiraj se!</button>
 	</form>
 

@@ -97,6 +97,12 @@ class UsersController extends BaseController
 						array_push($hotel_kriteriji, $_POST['sort'][$i]);
 				}
 		}
+	}
+		else {
+			$ss3 = new SmjestajService();
+			$polje_hotela = $ss3->getHotelsByName($_SESSION['ime_grada']);
+			array_push($polje_polja_hotela, $polje_hotela);
+		}
 			if(isset($_POST['filter']))
 			{
 				$M = count($_POST['filter']);
@@ -152,7 +158,7 @@ class UsersController extends BaseController
 			$niz_id = array();
 			foreach($polje_polja_hotela as $polje_hotela)
 			{
-				if($hotel_kriteriji[$i] === 'cijena_po_osobi')
+				if(isset($hotel_kriteriji[$i]) && $hotel_kriteriji[$i] === 'cijena_po_osobi')
 				{
 					foreach($polje_hotela as $hotel)
 						array_push($niz_id, $hotel->id);
@@ -167,7 +173,7 @@ class UsersController extends BaseController
 							}
 					}
 				}
-				if($hotel_kriteriji[$i] === 'broj_osoba')
+				if(isset($hotel_kriteriji[$i]) && $hotel_kriteriji[$i] === 'broj_osoba')
 				{
 					foreach($polje_hotela as $hotel)
 						array_push($niz_id, $hotel->id);
@@ -197,7 +203,7 @@ class UsersController extends BaseController
 			echo '<br>';
 
 			//$ss3->obradiSort($_SESSION['ime_grada'], $_POST['sort']);
-		}
+
 	}
 
 };

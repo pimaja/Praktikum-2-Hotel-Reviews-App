@@ -95,6 +95,40 @@ class SmjestajService
 		return $arr;
 	}
 
+
+	function getHotelsByName( $ime_grada)
+	{
+		try
+		{
+			$db = DB::getConnection();
+			$st = $db->prepare( 'SELECT * FROM projekt_hoteli WHERE ime_grada=:ime_grada' );
+			$st->execute(array('ime_grada' => $ime_grada));
+		}
+		catch( PDOException $e ) { exit( 'PDO error ' . $e->getMessage() ); }
+
+		$arr = array();
+		while( $row = $st->fetch() )
+		{
+			try
+			{
+				$db = DB::getConnection();
+				$st2 = $db->prepare( 'SELECT * FROM projekt_sobe WHERE id_hotela=:id_hotela' );
+				$st2->execute(array('id_hotela' => $row['id']));
+			}
+			catch( PDOException $e ) { exit( 'PDO error ' . $e->getMessage() ); }
+
+			$arr2 = array();
+			while ($row2 = $st2->fetch()) $arr2[] = new Soba($row['ime_hotela'], $row2['id'], $row2['id_hotela'], $row2['broj_osoba'], $row2['tip_kreveta'],
+																										$row2['vlastita_kupaonica'], $row2['cijena_po_osobi']);
+			$arr[] = new Hotel( $row['id'], $row['ime_grada'], $row['ime_hotela'], $row['adresa_hotela'], $row['udaljenost_od_centra'],
+												$row['ocjena'], $row['broj_zvjezdica'], $arr2 );
+	}
+
+	return $arr;
+
+ }
+
+ 
 	function getHotelsByNameOrderBy( $ime_grada, $kriterij )
 	{
 			if($kriterij === 'udaljenost_od_centra' || $kriterij === 'ocjena' || $kriterij === 'broj_zvjezdica')
