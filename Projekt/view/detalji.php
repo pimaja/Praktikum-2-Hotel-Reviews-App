@@ -5,6 +5,15 @@
 <tr><td> <?php echo $hotel->adresa_hotela; ?> </td><td><?php echo $hotel->udaljenost_od_centra; ?> </td>
   <td> <?php echo $hotel->ocjena; ?> </td><td><?php echo $hotel->broj_zvjezdica; ?> </td></tr></table>
 
+<h2>Ponuđene sobe: </h2>
+<table><tr><th>Broj osoba</th><th>Tip kreveta</th><th>Vlastita kupaonica</th><th>Cijena po osobi</th></tr>
+<?php foreach($hotel->sobe as $soba)
+{ ?>
+<tr><td><?php echo $soba->broj_osoba; ?></td><td><?php echo $soba->tip_kreveta; ?></td>
+  <td><?php echo $soba->vlastita_kupaonica; ?></td><td><?php echo $soba->cijena_po_osobi; ?></td></tr>
+<?php } ?>
+</table>
+
 <h2>Komentari i ocjene: </h2>
 <table><tr><th>Ime</th><th>Prezime</th><th>Komentar</th><th>Ocjena</th></tr>
 <?php foreach($komentari as $komentar){ ?>

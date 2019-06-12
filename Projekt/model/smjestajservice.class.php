@@ -88,8 +88,8 @@ class SmjestajService
 			if(in_array($row['id_hotela'], $ids))
 			{
 				$ime_hotela = $this->getHotelNameById( $row['id_hotela']);
-				$arr[] = new Soba($ime_hotela, $row['id'], $row['id_hotela'], $row['broj_osoba'], $row['tip_kreveta'], $row['vlastita_kupaonica'],
-													$row['cijena_po_osobi']);
+				$arr[] = new Soba($ime_hotela, $row['id'], $row['id_hotela'], $row['broj_osoba'],
+													$row['tip_kreveta'], $row['vlastita_kupaonica'], $row['cijena_po_osobi']);
 			}
 		}
 		return $arr;
@@ -118,10 +118,11 @@ class SmjestajService
 			catch( PDOException $e ) { exit( 'PDO error ' . $e->getMessage() ); }
 
 			$arr2 = array();
-			while ($row2 = $st2->fetch()) $arr2[] = new Soba($row['ime_hotela'], $row2['id'], $row2['id_hotela'], $row2['broj_osoba'], $row2['tip_kreveta'],
-																										$row2['vlastita_kupaonica'], $row2['cijena_po_osobi']);
-			$arr[] = new Hotel( $row['id'], $row['ime_grada'], $row['ime_hotela'], $row['adresa_hotela'], $row['udaljenost_od_centra'],
-												$row['ocjena'], $row['broj_zvjezdica'], $arr2 );
+			while ($row2 = $st2->fetch())
+				$arr2[] = new Soba($row['ime_hotela'], $row2['id'], $row2['id_hotela'], $row2['broj_osoba'],
+														$row2['tip_kreveta'], $row2['vlastita_kupaonica'], $row2['cijena_po_osobi']);
+			$arr[] = new Hotel( $row['id'], $row['ime_grada'], $row['ime_hotela'], $row['adresa_hotela'],
+													$row['udaljenost_od_centra'], $row['ocjena'], $row['broj_zvjezdica'], $arr2 );
 	}
 
 	return $arr;
@@ -158,10 +159,11 @@ class SmjestajService
 				catch( PDOException $e ) { exit( 'PDO error ' . $e->getMessage() ); }
 
 				$arr2 = array();
-				while ($row2 = $st2->fetch()) $arr2[] = new Soba($row['ime_hotela'], $row2['id'], $row2['id_hotela'], $row2['broj_osoba'], $row2['tip_kreveta'],
-																												$row2['vlastita_kupaonica'], $row2['cijena_po_osobi']);
-				$arr[] = new Hotel( $row['id'], $row['ime_grada'], $row['ime_hotela'], $row['adresa_hotela'], $row['udaljenost_od_centra'],
-														$row['ocjena'], $row['broj_zvjezdica'], $arr2 );
+				while ($row2 = $st2->fetch())
+					$arr2[] = new Soba($row['ime_hotela'], $row2['id'], $row2['id_hotela'], $row2['broj_osoba'],
+															$row2['tip_kreveta'], $row2['vlastita_kupaonica'], $row2['cijena_po_osobi']);
+				$arr[] = new Hotel( $row['id'], $row['ime_grada'], $row['ime_hotela'], $row['adresa_hotela'],
+															$row['udaljenost_od_centra'], $row['ocjena'], $row['broj_zvjezdica'], $arr2 );
 			}
 		}
 		else {
@@ -186,10 +188,11 @@ class SmjestajService
 					catch( PDOException $e ) { exit( 'PDO error ' . $e->getMessage() ); }
 
 					$arr2 = array();
-					while ($row2 = $st2->fetch()) $arr2[] = new Soba($row['ime_hotela'], $row2['id'], $row2['id_hotela'], $row2['broj_osoba'], $row2['tip_kreveta'],
-																														$row2['vlastita_kupaonica'], $row2['cijena_po_osobi']);
-					$arr[] = new Hotel( $row['id'], $row['ime_grada'], $row['ime_hotela'], $row['adresa_hotela'], $row['udaljenost_od_centra'],
-																$row['ocjena'], $row['broj_zvjezdica'], $arr2 );
+					while ($row2 = $st2->fetch())
+						$arr2[] = new Soba($row['ime_hotela'], $row2['id'], $row2['id_hotela'], $row2['broj_osoba'],
+																$row2['tip_kreveta'], $row2['vlastita_kupaonica'], $row2['cijena_po_osobi']);
+					$arr[] = new Hotel( $row['id'], $row['ime_grada'], $row['ime_hotela'], $row['adresa_hotela'],
+																$row['udaljenost_od_centra'], $row['ocjena'], $row['broj_zvjezdica'], $arr2 );
 				}
 			}
 		}
