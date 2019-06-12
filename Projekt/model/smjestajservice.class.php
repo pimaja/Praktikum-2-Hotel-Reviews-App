@@ -128,7 +128,7 @@ class SmjestajService
 
  }
 
- 
+
 	function getHotelsByNameOrderBy( $ime_grada, $kriterij )
 	{
 			if($kriterij === 'udaljenost_od_centra' || $kriterij === 'ocjena' || $kriterij === 'broj_zvjezdica')
@@ -307,6 +307,39 @@ class SmjestajService
 				if(!$test) unset($polje_polja_hotela[$kljuc][$key]);
 			}
 		}
+	}
+
+	function getCommentsByHotelId($id)
+	{
+		try
+		{
+			$db = DB::getConnection();
+			$st = $db->prepare( 'SELECT * FROM projekt_ocjene WHERE id_hotela=:id_hotela' );
+			$st->execute(array('id_hotela' => $id));
+		}
+		catch( PDOException $e ) { exit( 'PDO error ' . $e->getMessage() ); }
+
+		$arr = array();
+		while( $row = $st->fetch() )
+		{
+			//Nabavi ime i prezime korisnika preko njegovog id
+			try
+			{
+				$db = DB::getConnection();
+				$st2 = $db->prepare( 'SELECT name, surname FROM projekt_korisnici WHERE id=:id' );
+				$st2->execute(array('id' => $row['id_user']));
+			}
+			catch( PDOException $e ) { exit( 'PDO error ' . $e->getMessage() ); }
+
+			$row2 = $st2->fetch();
+			if( $row2 === false )
+				return null;
+
+			$arr[] = new Ocjena( $row['id'], $row['id_user'], $row2['name'], $row2['surname'], $row['id_hotela'],
+														$row['ocjena_korisnika'], $row['komentar']);
+		}
+
+		return $arr;
 	}
 
 

@@ -78,6 +78,12 @@ class UsersController extends BaseController
 			$this->odlogiraj();
 			exit();
 		}
+		if(isset($_POST['natrag']))
+		{
+			$this->registry->template->title = 'Odaberite grad koji Vas zanima';
+			$this->registry->template->show( 'odabir' );
+			exit();
+		}
 		//$polje_polja_soba= array();
 		$polje_polja_hotela= array();
 		//$soba_kriteriji= array();
@@ -200,10 +206,73 @@ class UsersController extends BaseController
 			$this->registry->template->sort_osobe = $sort_osobe;
 			$this->registry->template->title = 'Sortiraj i filtriraj!';
 			$this->registry->template->show( 'sortirano_filtrirano' );
-			echo '<br>';
+			//echo '<br>';
 
 			//$ss3->obradiSort($_SESSION['ime_grada'], $_POST['sort']);
 
+	}
+
+	public function check_details()
+	{
+		if(isset($_POST['odlogiraj']))
+		{
+			$this->odlogiraj();
+			exit();
+		}
+
+		if(isset($_POST['natrag']))
+		{
+			$this->registry->template->title = 'Odaberite kako želite da Vam hoteli budu sortirani i filtrirani';
+			$this->registry->template->show( 'sortiraj_filtriraj' );
+			unset($_SESSION['detalji']);
+			unset($_SESSION['id_hotela']);
+			exit();
+		}
+			//$polje_polja_hotela= array();
+			$ss = new SmjestajService();
+			$polje_hotela = $ss->getHotelsByName($_SESSION['ime_grada']);
+			//array_push($polje_polja_hotela, $polje_hotela);
+
+			foreach($polje_hotela as $hotel)
+			{
+				//echo $hotel->ime_hotela;
+				if((isset($_POST['detalji']) && $_POST['detalji'] === $hotel->ime_hotela) ||
+				(isset($_SESSION['detalji']) && $_SESSION['detalji'] === $hotel->ime_hotela))
+				{
+					$_SESSION['detalji'] = $hotel->ime_hotela;
+					$_SESSION['id_hotela'] = $hotel->id;
+					$polje_komentara = $ss->getCommentsByHotelId($hotel->id);
+					$this->registry->template->title = 'Detalji hotela';
+					$this->registry->template->hotel = $hotel;
+					$this->registry->template->komentari = $polje_komentara;
+					$this->registry->template->show( 'detalji' );
+					exit();
+				}
+			}
+
+	}
+
+	public function check_comments()
+	{
+		if(isset($_POST['odlogiraj']))
+		{
+			$this->odlogiraj();
+			exit();
+		}
+
+		/*if(isset($_POST['natrag'])) // To se tu mora posebno riješit jer nakon novog posta ne zna koji su filtri
+																	// i kriteriji za sort, možda koristit COOCKIE ili SESSION??
+		{
+			$this->registry->template->title = 'Sortiraj i filtriraj!';
+			$this->registry->template->show( 'sortirano_filtrirano' );
+			exit();
+		}*/
+
+		if(isset($_POST['komentar']))
+		{
+			//Tu sad jos dodat komentar u bazu i prebacit opet
+			//na fju $this->check_details(); da se ispise i novi komentar...
+		}
 	}
 
 };

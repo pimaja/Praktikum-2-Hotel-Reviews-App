@@ -1,4 +1,7 @@
-<h1>Odaberite kako želite da Vam hoteli budu sortirani i filtrirani</h1>
+<?php require_once __SITE_PATH . '/view/_header.php';  ?>
+
+
+<p>Možete odabrati više kriterija sortiranja i više kriterija za filter. Ako ne odaberete ništa od navedenog ispisat će Vam se svi hoteli u tom gradu.</p>
 <form method="post" action="<?php echo __SITE_URL; ?>/index.php?rt=users/check_sort_filt">
 <h2>Odaberite kriterij/e po kojima želite sortirati:</h2>
 <input type="checkbox" name="sort[]" value = "cijena_po_osobi"> Cijena <br />
@@ -21,5 +24,8 @@
 <input type="checkbox" name="filter[]" value = "vlastita_kupaonica"> Obvezna kupaonica<br />
 <br />
 <button type="submit" name="button">Dalje</button><br /><br />
+<button type="submit" name="natrag">Natrag</button><br /><br />
 <button type="submit" name="odlogiraj">Odlogiraj se</button>
 </form>
+
+<?php require_once __SITE_PATH . '/view/_footer.php'; ?>
