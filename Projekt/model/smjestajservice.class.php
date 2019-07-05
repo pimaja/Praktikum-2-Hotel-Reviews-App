@@ -19,6 +19,7 @@ class SmjestajService
 			return $row['password'];
 	}
 
+ //postavi novog korisnika u bazu
 	function dodajUsera ($name, $surname, $pass)
 	{
 		try
@@ -31,7 +32,8 @@ class SmjestajService
 		}
 		catch( PDOException $e ) { exit( 'PDO error ' . $e->getMessage() ); }
 	}
-		function getHotelIdsByName( $ime_grada)
+
+	function getHotelIdsByName( $ime_grada)
 	{
 		try
 		{
@@ -95,7 +97,6 @@ class SmjestajService
 		return $arr;
 	}
 
-
 	function getHotelsByName( $ime_grada)
 	{
 		try
@@ -129,9 +130,44 @@ class SmjestajService
 
  }
 
+ function getCommentsByHotelId($id)
+ {
+	 try
+	 {
+		 $db = DB::getConnection();
+		 $st = $db->prepare( 'SELECT * FROM projekt_ocjene WHERE id_hotela=:id_hotela' );
+		 $st->execute(array('id_hotela' => $id));
+	 }
+	 catch( PDOException $e ) { exit( 'PDO error ' . $e->getMessage() ); }
 
+	 $arr = array();
+	 while( $row = $st->fetch() )
+	 {
+		 //Nabavi ime i prezime korisnika preko njegovog id
+		 try
+		 {
+			 $db = DB::getConnection();
+			 $st2 = $db->prepare( 'SELECT name, surname FROM projekt_korisnici WHERE id=:id' );
+			 $st2->execute(array('id' => $row['id_user']));
+		 }
+		 catch( PDOException $e ) { exit( 'PDO error ' . $e->getMessage() ); }
+
+		 $row2 = $st2->fetch();
+		 if( $row2 === false )
+			 return null;
+
+		 $arr[] = new Ocjena( $row['id'], $row['id_user'], $row2['name'], $row2['surname'], $row['id_hotela'],
+													 $row['ocjena_korisnika'], $row['komentar']);
+	 }
+
+	 return $arr;
+ }
+
+ //za razliku od prijasnjih funkcija ova je kompliciranija i samo ime
+ //ne opisuje dovoljno sto funkcija radi
 	function getHotelsByNameOrderBy( $ime_grada, $kriterij )
 	{
+		//slucaj kad korisnik zeli sortirati po atributima iz tablice projekt_hoteli
 			if($kriterij === 'udaljenost_od_centra' || $kriterij === 'ocjena' || $kriterij === 'broj_zvjezdica')
 			{
 				try
@@ -147,6 +183,8 @@ class SmjestajService
 			}
 			catch( PDOException $e ) { exit( 'PDO error ' . $e->getMessage() ); }
 
+			//popuni polje soba koje je dodatna varijbla u klasi hotel.class osim atributa iz
+			//tablice projekt_hoteli
 			$arr = array();
 			while( $row = $st->fetch() )
 			{
@@ -168,9 +206,11 @@ class SmjestajService
 		}
 		else {
 			$arr = array();
+			//prvo dohvati sobe soritrane po kriteriju
 			$sobe = $this->getRoomsByNameOrderBy($ime_grada, $kriterij);
 			foreach($sobe as $var)
 			{
+				//za svaku sobu nadji hotel kojem pripada
 				$db = DB::getConnection();
 			  $st = $db->prepare( 'SELECT * FROM projekt_hoteli WHERE id=:id_hotela' );
 				$st->execute(array('id_hotela' => $var->id_hotela));
@@ -179,6 +219,8 @@ class SmjestajService
 					try
 					{
 						$db = DB::getConnection();
+						//mozda nepotreban dio, bitno je samo dohvatit sobe hotela kao i u gornjem
+						//prvom slucaju da bi se to polje moglo spremit u klasu hotel.class
 						if($kriterij === 'broj_osoba')
 							$st2 = $db->prepare( 'SELECT * FROM projekt_sobe WHERE id_hotela=:id_hotela ORDER BY broj_osoba' );
 					  if($kriterij === 'cijena_po_osobi')
@@ -200,6 +242,9 @@ class SmjestajService
 
 	}
 
+	//slijede funkcije koje micu hotele iz polja koja ne zadovoljavaju kriterije
+	//prodjemo po svim poljima hotela i iz svakog izbacujemo svaki hotel koji ne zadovoljava
+	//kriterij
 	function applyFilterCijena(  & $polje_polja_hotela, $cijena)
 	{
 		foreach($polje_polja_hotela as $kljuc => $polje)
@@ -213,6 +258,7 @@ class SmjestajService
 							$test = 1;
 							break;
 						}
+				//nema sobe u hotelu koja ima manju cijenu od postavljene, makni taj hotel
 				if(!$test) unset($polje_polja_hotela[$kljuc][$key]);
 			}
 		}
@@ -220,6 +266,7 @@ class SmjestajService
 
 	function applyFilterUdaljenost( & $polje_polja_hotela, $udaljenost)
 	{
+		//makni sve hotele kojima je udaljenost od centra veca od postavljene
 		foreach($polje_polja_hotela as $kljuc => $polje)
 			foreach($polje as $key => $hotel)
 				if($hotel->udaljenost_od_centra > $udaljenost)
@@ -239,6 +286,7 @@ class SmjestajService
 							$test = 1;
 							break;
 						}
+				//nema sobe u hotelu koja ima sobu za postavljeni broj osoba, makni taj hotel
 				if(!$test) unset($polje_polja_hotela[$kljuc][$key]);
 			}
 		}
@@ -246,6 +294,7 @@ class SmjestajService
 
 	function applyFilterOcjena( & $polje_polja_hotela, $ocjena)
 	{
+		//makni sve hotele kojima je ocjena manja od postavljene
 		foreach($polje_polja_hotela as $kljuc => $polje)
 			foreach($polje as $key => $hotel)
 				if($hotel->ocjena < $ocjena)
@@ -254,6 +303,7 @@ class SmjestajService
 
 	function applyFilterZvjezdice( & $polje_polja_hotela, $zvjezdice)
 	{
+		//makni sve hotele kojima je broj zvijezdica manji od postavljenog
 		foreach($polje_polja_hotela as $kljuc => $polje)
 			foreach($polje as $key => $hotel)
 				if($hotel->broj_zvjezdica < $zvjezdice)
@@ -273,6 +323,7 @@ class SmjestajService
 							$test = 1;
 							break;
 						}
+				//nema sobe u hotelu koja ima vlastitu kupaonicu, makni taj hotel
 				if(!$test) unset($polje_polja_hotela[$kljuc][$key]);
 			}
 		}
@@ -289,11 +340,15 @@ class SmjestajService
 				foreach($hotel->sobe as $soba)
 				{
 					$string = $soba->tip_kreveta;
+					//explode zato sto su tako navedeni tipovi kreveta u pojedinoj sobi
+					//u tablici projekt_sobe
 					$tipovi = explode(", " , $string);
 					$nastavak = 0;
 					if(count($nizKreveti) === count($tipovi))
 						foreach($tipovi as $var)
 						{
+							//moramo provjerit sa in_array jer mozda poredak tipova kreveta nije isti
+							//u $nizKreveti i $tipovi (zbog tog ranij gledamo jesu nizovi iste duljine)
 							if(!in_array($var, $nizKreveti))
 							{
 								$nastavak = 1;
@@ -306,44 +361,16 @@ class SmjestajService
 						$test = 1;
 						break;
 					}
+					//dok je nastavak 1 znaci da nismo nasli hotel koji ima sobu sa
+					//trazenim tipovima krevetima, kad je 0 onda jesmo i postavljamo test na 1
 				}
+				//nema sobe u hotelu koja ima sobu s trazenim brojem i vrstama kreveta, makni taj hotel
 				if(!$test) unset($polje_polja_hotela[$kljuc][$key]);
 			}
 		}
 	}
 
-	function getCommentsByHotelId($id)
-	{
-		try
-		{
-			$db = DB::getConnection();
-			$st = $db->prepare( 'SELECT * FROM projekt_ocjene WHERE id_hotela=:id_hotela' );
-			$st->execute(array('id_hotela' => $id));
-		}
-		catch( PDOException $e ) { exit( 'PDO error ' . $e->getMessage() ); }
 
-		$arr = array();
-		while( $row = $st->fetch() )
-		{
-			//Nabavi ime i prezime korisnika preko njegovog id
-			try
-			{
-				$db = DB::getConnection();
-				$st2 = $db->prepare( 'SELECT name, surname FROM projekt_korisnici WHERE id=:id' );
-				$st2->execute(array('id' => $row['id_user']));
-			}
-			catch( PDOException $e ) { exit( 'PDO error ' . $e->getMessage() ); }
-
-			$row2 = $st2->fetch();
-			if( $row2 === false )
-				return null;
-
-			$arr[] = new Ocjena( $row['id'], $row['id_user'], $row2['name'], $row2['surname'], $row['id_hotela'],
-														$row['ocjena_korisnika'], $row['komentar']);
-		}
-
-		return $arr;
-	}
 
 
 	/*function obradiSort($ime_grada, $nizKriterija)

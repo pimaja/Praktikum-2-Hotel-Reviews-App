@@ -1,5 +1,7 @@
 <?php
 
+//klasa sa varijablama koje su više manje jednake atributima iz tablice projekt_ocjene
+
 class Ocjena
 {
 	protected $id, $id_user, $ime_korisnika, $prezime_korisnika, $id_hotela, $ocjena_korisnika, $komentar;

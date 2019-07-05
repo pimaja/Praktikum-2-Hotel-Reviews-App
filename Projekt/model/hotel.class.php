@@ -1,5 +1,8 @@
 <?php
 
+//klasa sa varijablama koje su više manje jednake atributima iz tablice projekt_hoteli s dodanim poljem soba
+//koje nudi taj hotel
+
 class Hotel
 {
 	protected $id, $ime_grada, $ime_hotela, $adresa_hotela, $udaljenost_od_centra, $ocjena, $broj_zvjezdica, $sobe;

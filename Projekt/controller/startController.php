@@ -14,6 +14,7 @@ class StartController extends BaseController
 
 	public function ulogiraj_registiraj()
 	{
+		//provjeri zeli li se korisnik ulogirati ili registrirati
 		if(isset($_POST['ulogiraj']))
 		{
 			$this->registry->template->title = 'Login';

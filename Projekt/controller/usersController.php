@@ -7,6 +7,7 @@ class UsersController extends BaseController
 
 	}
 
+	//ciscenje sessiona, vracanje na pocetak, cekanje novog korisnika
 	public function odlogiraj()
 	{
 		unset($_POST['ime']); unset($_POST['prezime']); unset($_POST['pass']);
@@ -15,6 +16,7 @@ class UsersController extends BaseController
 		header( 'Location: ' . __SITE_URL . '/index.php?rt=start/index');
 	}
 
+	//prikazi stranicu odabir na kojoj su ponudjeni gradovi
 	public function odabir()
 	{
 		$this->registry->template->title = 'Odaberi!';
@@ -31,6 +33,7 @@ class UsersController extends BaseController
 			{
 				session_start();
 				$secret_word = 'racunarski praktikum 2!!!';
+				//spremi u session korisnika koji se sad ulogirao
 				$_SESSION['login'] = $_POST['ime'] . ','. $_POST['prezime'] . ',' . md5( $_POST['ime'] . $secret_word );;
 				header( 'Location: ' . __SITE_URL . '/index.php?rt=users/odabir');
 				exit();
@@ -47,6 +50,7 @@ class UsersController extends BaseController
 			$ss2->dodajUsera($_POST['ime'], $_POST['prezime'], $_POST['pass']);
 			session_start();
 			$secret_word = 'racunarski praktikum 2!!!';
+			//spremi u session korisnika koji se sad registrirao
 			$_SESSION['login'] = $_POST['ime'] . ',' . $_POST['prezime'] . ',' . md5( $_POST['ime'] . $secret_word );;
 			header( 'Location: ' . __SITE_URL . '/index.php?rt=users/odabir');
 			exit();
@@ -63,11 +67,12 @@ class UsersController extends BaseController
 		}
 		if(isset($_POST['odabir']))
 		{
+			//spremi u session grad kojeg je trenutni korisnik odabrao
 			$_SESSION['ime_grada'] = $_POST['odabir'];
 			$this->registry->template->title = 'Sortiraj i filtriraj!';
 			$this->registry->template->show( 'sortiraj_filtriraj' );
 			//exit();
-			//sad treba omogućiti da pretrazuje hotele po filerima(udaljenost, vlastita soba...) ili sortira(po cijeni...)
+			//sad treba omogućiti da pretrazuje hotele po filterima(udaljenost, vlastita soba...) ili sortira(po cijeni...)
 		}
 	}
 
@@ -78,6 +83,7 @@ class UsersController extends BaseController
 			$this->odlogiraj();
 			exit();
 		}
+		//makni sessione nastale na trenutnoj stranici i vrati se na prethodnu
 		if(isset($_POST['natrag']))
 		{
 			$this->registry->template->title = 'Odaberite grad koji Vas zanima';
@@ -116,6 +122,10 @@ class UsersController extends BaseController
 		$polje_polja_hotela= array();
 		$hotel_kriteriji= array();
 		$filtri = array();
+		//korisnik je odabrao neke kriterije sortiranja
+		//u $polje_polja_hotela stavljamo onoliko polja hotela koliko je
+		//korisnik odabrao kriterija sortiranja
+		//u polju hotel_kriteriji su pobrojani kriteriji po kojima korisnik zeli sortirati
 		if(isset($_SESSION['sort']))
 		{
 			$ss3 = new SmjestajService();
@@ -126,15 +136,20 @@ class UsersController extends BaseController
 						array_push($polje_polja_hotela, $polje_hotela);
 						array_push($hotel_kriteriji, $_SESSION['sort'][$i]);
 				}
-	}
+		}
+		//korisnik nije odabrao kriterije sortiranja pa imamo samo
+		//jedno polje hotela koje sadrzi sve hotele iz tog grada
 		else {
 			$ss3 = new SmjestajService();
 			$polje_hotela = $ss3->getHotelsByName($_SESSION['ime_grada']);
 			array_push($polje_polja_hotela, $polje_hotela);
 		}
+		//sada iz svakog polja hotela mičemo hotele koji ne zadovoljavaju kriterije filtra
+		//koje je korisnik odabrao (ako ih je odabrao), to obavljaju funkcije iz klase SmjestajService
 			if(isset($_SESSION['filter']))
 			{
 				$M = count($_SESSION['filter']);
+				//polje filtri sadrzi pobrojane filtre s vrijednostima
 				for($i=0; $i < $M; $i++)
 				{
 					if($_SESSION['filter'][$i] === 'cijena_po_osobi' && isset($_SESSION['cijena']))
@@ -155,6 +170,9 @@ class UsersController extends BaseController
 					if($_SESSION['filter'][$i] === 'tip_kreveta' && (isset($_POST['bracni'])
 					|| isset($_SESSION['odvojeni']) || isset($_SESSION['na_kat'])))
 					{
+						//punimo niz kreveti s informacijama o broju i vrsti kreveta koje korisnik hoće
+						//taj niz stavljamo o niz filtri (informacije o filtrima koje je korisnik odabrao)
+						//taj niz je bitan također bitan kao argument fje applyFilterKreveti
 						$nizKreveti = array();
 						if($_SESSION['bracni'] !== '' && $_SESSION['bracni'] !== '0')
 							array_push($nizKreveti, $_SESSION['bracni'].' x bracni');
@@ -185,6 +203,10 @@ class UsersController extends BaseController
 				}
 			}
 
+			//ako su hoteli sortirani po nekom atributu koji se ne nalazi u tablici projekt_hoteli
+			//vec u tablici projekt_sobe onda zelimo osim vrijednosti atributa iz tablice projekt_hoteli
+			//ispisati i pripadnu vrijednost atributa iz tablice porjekt_sobe po kojemu se sortiralo
+			//ovdje se pripremaju nizovi sort_cijene i sort_sobe za ispis ako korisnik zeli sort po tim kriterijima
 			$sort_cijene = array();
 			$sort_osobe = array();
 			$i=0;
@@ -195,9 +217,16 @@ class UsersController extends BaseController
 				{
 					foreach($polje_hotela as $hotel)
 						array_push($niz_id, $hotel->id);
+					//treba nam array_unique jer u polju hotela se neki hotel moze pojavit i vise puta jer nudi vise soba
 					array_unique($niz_id);
 					foreach($polje_hotela as $hotel)
 					{
+						//sad za svaki hotel u tom polju hotela trazimo njegove sobe i u niz
+						//sort_cijene pushamo cijenu te sobe
+
+						//da nismo koristili niz_id onda bi se cijena pojedine sobe pojedinog hotela
+						// u niz sort_cijene zapisala onoliko puta koliko taj hotel ima soba odnosno
+						//koliko puta se pojavljue u $polje_hotela
 						if(in_array($hotel->id, $niz_id))
 							foreach($hotel->sobe as $soba)
 							{
@@ -206,6 +235,7 @@ class UsersController extends BaseController
 							}
 					}
 				}
+				//potpuno isti kod samo za kriterij broj_osoba
 				if(isset($hotel_kriteriji[$i]) && $hotel_kriteriji[$i] === 'broj_osoba')
 				{
 					foreach($polje_hotela as $hotel)
@@ -223,6 +253,8 @@ class UsersController extends BaseController
 				}
 				$i++;
 			}
+			//na kraju je samo potrebno sortirati ta polja i spremna su za ispisivanje uz
+			//informacije o hotelima
 			sort($sort_cijene); sort($sort_osobe);
 			$this->registry->template->hoteli = $polje_polja_hotela;
 			$this->registry->template->hotel_kriteriji = $hotel_kriteriji;
@@ -241,7 +273,7 @@ class UsersController extends BaseController
 			$this->odlogiraj();
 			exit();
 		}
-
+		//makni sessione nastale na trenutnoj stranici i vrati se na prethodnu
 		if(isset($_POST['natrag']))
 		{
 			$this->registry->template->title = 'Odaberite kako želite da Vam hoteli budu sortirani i filtrirani';
@@ -253,8 +285,10 @@ class UsersController extends BaseController
 			$ss = new SmjestajService();
 			$polje_hotela = $ss->getHotelsByName($_SESSION['ime_grada']);
 
+			//pripremi sve informacije o hotelu za ispis na stranici detalji
 			foreach($polje_hotela as $hotel)
 			{
+				//session je tu ako se vracamo sa neke stranice natrag na ovu
 				if((isset($_POST['detalji']) && $_POST['detalji'] === $hotel->ime_hotela) ||
 				(isset($_SESSION['detalji']) && $_SESSION['detalji'] === $hotel->ime_hotela))
 				{

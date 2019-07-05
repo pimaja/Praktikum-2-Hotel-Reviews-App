@@ -1,5 +1,7 @@
 <?php
 
+//klasa sa varijablama koje su više manje jednake atributima iz tablice projekt_sobe
+
 class Soba
 {
 	protected $ime_hotela, $id, $id_hotela, $broj_osoba, $tip_kreveta, $vlastita_kupaonica, $cijena_po_osobi;
