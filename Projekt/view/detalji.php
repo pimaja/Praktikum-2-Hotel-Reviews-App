@@ -27,12 +27,12 @@
 <h2>Pogledaj na karti: </h2>
 <div id="mapa"></div>
 <script>
-/*var sir = [52.326110, 52.383840, 52.360590, 52.332880, 52.369030, 48.847500, 48.874670, 48.827110, 48.878540, 38.727700,
+var sir = [52.326110, 52.383840, 52.360590, 52.332880, 52.369030, 48.847500, 48.874670, 48.827110, 48.878540, 38.727700,
   38.726400, 38.715990, 38.721650, 52.521751, 52.512980, 52.530160, 55.780980, 55.777490, 55.744430, 55.758940, 37.985950,
-  37.978230, 36.897220, 50.101140, 50.086980, 50.080800];
+  37.978230, 37.980150, 50.101140, 50.086980, 50.080800];
 var duz = [4.953490, 4.902230, 4.915950, 4.920040, 4.897320, 2.371860, 2.305720, 2.348530, 2.370630, -9.158480, -9.142370,
   -9.143810, -9.146190, 13.411500, 13.405100, 13.401940, 37.620820, 37.580170, 37.635880, 37.605380, 23.720780, 23.724300,
-  30.714830, 14.397590, 14.433370, 14.417900];
+  23.727740, 14.397590, 14.433370, 14.417900];
 $( document ).ready( function()
 {
   var id = "<?php echo $hotel->id ?>";
@@ -47,10 +47,21 @@ $( document ).ready( function()
             view: new ol.View(
             {
                 center: ol.proj.fromLonLat( [duz[id-1], sir[id-1]] ), // zemljopisne koord. centra mape
-                zoom: 15
+                zoom: 17
             })
         });
-});*/
+    var marker = new ol.Feature({
+        geometry: new ol.geom.Point(ol.proj.transform([duz[id-1], sir[id-1]], 'EPSG:4326', 'EPSG:3857')),
+    });
+    var markers = new ol.source.Vector({
+        features: [marker]
+    });
+
+    var markerVectorLayer = new ol.layer.Vector({
+        source: markers,
+    });
+    openLayerMap.addLayer(markerVectorLayer);
+    });
 </script>
 
 <br /><br />

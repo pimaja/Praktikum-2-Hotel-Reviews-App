@@ -10,7 +10,12 @@ html{
 body{
 /*background-image: url("bckg.jpg");*/
   font-size: 18px;
-  margin-left: 4%;
+  margin-left: 2%;
+}
+
+table{
+  text-align: center;
+  border-spacing:10px;
 }
 
 #mapa { width: 800px; height: 600px; }
