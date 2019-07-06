@@ -1,5 +1,5 @@
 <?php require_once __SITE_PATH . '/view/_header.php'; ?>
-<link rel="stylesheet" href="<?php echo __SITE_URL;?>/css/style.css">
+<link rel="stylesheet" href="<?php echo __SITE_URL;?>/css/style.css"> 
 	<form method="post" action="<?php echo __SITE_URL; ?>/index.php?rt=users/check_login">
 	Ime: <input type="text" name="ime" /><br />
   Prezime: <input type="text" name="prezime" /><br />
