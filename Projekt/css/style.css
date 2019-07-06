@@ -7,16 +7,14 @@ html{
 }
 
 body{
-  /*background-image: url("giphy.gif");
-  background-repeat: no-repeat;
-  background-size: cover;*/
   text-align: center;
 }
 
 .ostali {
-  background-color: #800000;
-  border: none;
+  background-color: #ffbf00;
+  border-color: #800000;
   color: black;
+  font-weight: bold;
   padding: 16px 32px;
   text-align: center;
   font-size: 16px;
@@ -27,6 +25,7 @@ body{
   text-decoration: none;
   cursor: pointer;
 }
+
 
 .ostali:hover {opacity: 1}
 
