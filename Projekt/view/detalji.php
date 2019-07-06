@@ -6,25 +6,27 @@
 <tr><td> <?php echo $hotel->adresa_hotela; ?> </td><td><?php echo $hotel->udaljenost_od_centra; ?> </td>
   <td> <?php echo $hotel->ocjena; ?> </td><td><?php echo $hotel->broj_zvjezdica; ?> </td></tr></table>
 
-<h2>Ponuđene sobe: </h2>
+<h3>Ponuđene sobe: </h3>
+<?php if(count($hotel->sobe)!==0) { ?>
 <table><tr><th>Broj osoba</th><th>Tip kreveta</th><th>Vlastita kupaonica</th><th>Cijena po osobi</th></tr>
 <?php foreach($hotel->sobe as $soba)
 { ?>
 <tr><td><?php echo $soba->broj_osoba; ?></td><td><?php echo $soba->tip_kreveta; ?></td>
   <td><?php echo $soba->vlastita_kupaonica; ?></td><td><?php echo $soba->cijena_po_osobi; ?></td></tr>
 <?php } ?>
-</table>
+</table> <?php } else echo 'Trenutno nema ponuđenih soba'; ?>
 
 
-<h2>Komentari i ocjene: </h2>
+<h3>Komentari i ocjene: </h3>
+<?php if(count($komentari)!==0) { ?>
 <table><tr><th>Ime</th><th>Prezime</th><th>Komentar</th><th>Ocjena</th></tr>
 <?php foreach($komentari as $komentar){ ?>
   <tr><td> <?php echo $komentar->ime_korisnika; ?> </td><td><?php echo $komentar->prezime_korisnika; ?> </td>
     <td> <?php echo $komentar->komentar; ?> </td><td><?php echo $komentar->ocjena_korisnika; ?> </td></tr>
 <?php } ?>
-</table>
+</table> <?php } else echo 'Trenutno nema komentara za ovaj hotel'; ?>
 
-<h2>Pogledaj na karti: </h2>
+<h3>Pogledaj na karti: </h3>
 <div id="mapa"></div>
 <script>
 var sir = [52.326110, 52.383840, 52.360590, 52.332880, 52.369030, 48.847500, 48.874670, 48.827110, 48.878540, 38.727700,
@@ -66,19 +68,19 @@ $( document ).ready( function()
 
 <br /><br />
 
-<h2>Dodaj komentar: </h2>
+<h3>Dodaj komentar: </h3>
 <form method="post" action="<?php echo __SITE_URL; ?>/index.php?rt=users/check_comments">
   Ocjena: <input type="text" name="ocjena" /><br />
   Opis: <br />
   <textarea name="komentar" rows="10" cols="50">
     Ovdje napišite komentar.
   </textarea><br />
-<button type="submit" name="komentar_gumb">Dodaj komentar</button><br /><br />
+<button class='tablica_gumb' type="submit" name="komentar_gumb">Dodaj komentar</button><br /><br />
 
 <br /><br />
 
-<button type="submit" name="natrag">Natrag</button><br /><br />
-<button type="submit" name="odlogiraj">Odlogiraj se</button>
+<button class='ostali' type="submit" name="natrag">Natrag</button><br /><br />
+<button class='ostali' type="submit" name="odlogiraj">Odlogiraj se</button>
 </form>
 
 <?php require_once __SITE_PATH . '/view/_footer.php'; ?>

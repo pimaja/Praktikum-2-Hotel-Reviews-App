@@ -13,8 +13,8 @@
 <input type="radio" name="odabir" value = "Prag" class="big"> Prag <br />
 </big>
 <br />
-<button type="submit" name="button">Dalje</button><br /><br />
-<button type="submit" name="odlogiraj">Odlogiraj se</button>
+<button class='ostali' type="submit" name="button">Dalje</button><br /><br />
+<button class='ostali' type="submit" name="odlogiraj">Odlogiraj se</button>
 </form>
 
 <?php require_once __SITE_PATH . '/view/_footer.php'; ?>

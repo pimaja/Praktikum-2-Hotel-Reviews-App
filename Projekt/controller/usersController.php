@@ -74,6 +74,11 @@ class UsersController extends BaseController
 			//exit();
 			//sad treba omogućiti da pretrazuje hotele po filterima(udaljenost, vlastita soba...) ili sortira(po cijeni...)
 		}
+		else 
+		{
+			$this->registry->template->title = 'Odaberi!';
+			$this->registry->template->show( 'odabir' );
+		}
 	}
 
 	public function check_sort_filt()
@@ -253,11 +258,26 @@ class UsersController extends BaseController
 				}
 				$i++;
 			}
+			
+			//uredi polje $hotel_kriteriji tj. napravi novo tako da je ljepše za ispis (bez _)
+			$kriteriji = array();
+			for($i=0; $i<count($hotel_kriteriji); $i++)
+			{
+				if($hotel_kriteriji[$i] === 'cijena_po_osobi') 
+					$kriteriji[$i] = 'cijeni po osobi po noćenju';
+				else if($hotel_kriteriji[$i] === 'udaljenost_od_centra')
+					$kriteriji[$i] = 'udaljenosti od centra';
+				else if($hotel_kriteriji[$i] === 'broj_osoba')
+					$kriteriji[$i] = 'broju osoba u sobi';
+				else if($hotel_kriteriji[$i] === 'broj_zvjezdica')
+					$kriteriji[$i] =  'broju zvjezdica';
+				else $kriteriji[$i] =  'ocjeni';
+			}
 			//na kraju je samo potrebno sortirati ta polja i spremna su za ispisivanje uz
 			//informacije o hotelima
 			sort($sort_cijene); sort($sort_osobe);
 			$this->registry->template->hoteli = $polje_polja_hotela;
-			$this->registry->template->hotel_kriteriji = $hotel_kriteriji;
+			$this->registry->template->hotel_kriteriji = $kriteriji;
 			$this->registry->template->filtri = $filtri;
 			$this->registry->template->sort_cijene = $sort_cijene;
 			$this->registry->template->sort_osobe = $sort_osobe;
@@ -280,6 +300,11 @@ class UsersController extends BaseController
 			$this->registry->template->show( 'sortiraj_filtriraj' );
 			unset($_SESSION['detalji']);
 			unset($_SESSION['id_hotela']);
+			unset(	$_SESSION['sort']); unset($_SESSION['filter']);
+			unset($_SESSION['cijena']); unset($_SESSION['udaljenost']);
+			unset($_SESSION['osobe']); unset($_SESSION['bracni']);
+			unset($_SESSION['odvojeni']); unset($_SESSION['na_kat']);
+			unset($_SESSION['ocjena']); unset($_SESSION['zvjezdice']);
 			exit();
 		}
 			$ss = new SmjestajService();

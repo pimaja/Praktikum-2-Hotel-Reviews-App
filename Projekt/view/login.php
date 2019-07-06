@@ -4,7 +4,7 @@
 	Ime: <input type="text" name="ime" /><br />
   Prezime: <input type="text" name="prezime" /><br />
 	Password: <input type="password" name="pass"><br />
-	<button type="submit">Ulogiraj se!</button>
+	<button class='ostali' type="submit">Ulogiraj se!</button>
 	</form>
 
 <?php require_once __SITE_PATH . '/view/_footer.php'; ?>
