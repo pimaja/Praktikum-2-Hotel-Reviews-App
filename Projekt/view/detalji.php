@@ -28,6 +28,11 @@
 
 <h3>Pogledaj na karti: </h3>
 <div id="mapa"></div>
+<br/>
+<h3>Pregledaj slike:  </h3>
+Klikni na lijevi dio slike da bi vidio prethodnu te na desni dio slike da bi vidio sljedeću. <br/><br/>
+<canvas height="500" width="800" id="canvas"></canvas>
+
 <script>
 var sir = [52.326110, 52.383840, 52.360590, 52.332880, 52.369030, 48.847500, 48.874670, 48.827110, 48.878540, 38.727700,
   38.726400, 38.715990, 38.721650, 52.521751, 52.512980, 52.530160, 55.780980, 55.777490, 55.744430, 55.758940, 37.985950,
@@ -63,7 +68,39 @@ $( document ).ready( function()
         source: markers,
     });
     openLayerMap.addLayer(markerVectorLayer);
+
+    //dohvacanje slika, za svaki hotel imamo 5 slika, te one imaju oznake jednake (id-1)*5+1, ... (id-1)*5+5
+    var imgArray = new Array();
+    var oznaka = (id-1)*5+1;
+    for(var i=0; i<5; i++){
+      imgArray[i] = new Image();
+      imgArray[i].src = 'images/img'+oznaka+'.jpg';
+      oznaka++;
+    }
+
+    //iscrtavanje slika
+    var canvas = $( "#canvas" ).get(0);
+    var ctx = canvas.getContext( "2d" );
+    var k=0;
+
+    $( imgArray[k] ).on( "load", function() {
+      ctx.drawImage(this, 0, 0, 800, 500);
     });
+
+    function changeImage(event){
+
+      var rect = canvas.getBoundingClientRect();
+      var x = event.clientX - rect.left;
+      if(x<=400) k--;
+      else if(x>400) k++;
+      if(k<0) k=4;
+      if(k>=5) k=0;
+      ctx.drawImage(imgArray[k], 0, 0, 800, 500);
+    }
+
+    $("#canvas").on("click", changeImage);
+
+});
 </script>
 
 <br /><br />
