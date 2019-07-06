@@ -109,9 +109,7 @@ $( document ).ready( function()
 <form method="post" action="<?php echo __SITE_URL; ?>/index.php?rt=users/check_comments">
   Ocjena: <input type="text" name="ocjena" /><br />
   Opis: <br />
-  <textarea name="komentar" rows="10" cols="50">
-    Ovdje napišite komentar.
-  </textarea><br />
+  <textarea name="komentar" rows="10" cols="50">Ovdje napišite komentar.</textarea><br />
 <button class='tablica_gumb' type="submit" name="komentar_gumb">Dodaj komentar</button><br /><br />
 
 <br /><br />

@@ -4,6 +4,7 @@
 	Ime: <input type="text" name="ime" /><br />
   Prezime: <input type="text" name="prezime" /><br />
 	Password: <input type="password" name="pass"><br />
+	<br /><br />
 	<button class='ostali' type="submit">Ulogiraj se!</button>
 	</form>
 

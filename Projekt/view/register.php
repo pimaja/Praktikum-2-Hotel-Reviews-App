@@ -5,6 +5,7 @@
   Prezime: <input type="text" name="prezime" /><br />
 	Password: <input type="password" name="pass"><br />
   Ponovi password: <input type="password" name="pass2"><br />
+  <br /> <br />
 	<button class='ostali' type="submit">Registriraj se!</button>
 	</form>
 <?php require_once __SITE_PATH . '/view/_footer.php'; ?>

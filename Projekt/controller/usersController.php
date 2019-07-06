@@ -26,7 +26,7 @@ class UsersController extends BaseController
 	public function check_login()
 	{
 		$ss = new SmjestajService();
-		if(isset($_POST['ime'], $_POST['prezime']))
+		if(isset($_POST['ime'], $_POST['prezime']) && $_POST['ime'] !=='' && $_POST['prezime']!=='')
 			$lozinka = $ss->getPasswordByNameAndSurname( $_POST['ime'], $_POST['prezime'] );
 		if(isset( $_POST['pass'] ))
 			if(password_verify($_POST['pass'], $lozinka))
@@ -44,7 +44,9 @@ class UsersController extends BaseController
 
   public function check_register()
 	{
-		if(isset( $_POST['pass'] ) && isset( $_POST['pass2'] ) && $_POST['pass'] === $_POST['pass2'] )
+		if(isset($_POST['ime']) && isset($_POST['prezime']) && isset($_POST['pass']) && 
+				isset($_POST['pass2']) && $_POST['ime'] !=='' && $_POST['prezime'] !=='' 
+				&& $_POST['pass'] !=='' && $_POST['pass2'] !=='' && $_POST['pass'] === $_POST['pass2'] )
 		{
 			$ss2 = new SmjestajService();
 			$ss2->dodajUsera($_POST['ime'], $_POST['prezime'], $_POST['pass']);
@@ -349,18 +351,19 @@ class UsersController extends BaseController
 
 		if(isset($_POST['komentar_gumb']) && (isset($_POST['ocjena']) || isset($_POST['komentar'])))
 		{
-			$ocjena = ' '; $komentar = ' ';
-			if(isset($_POST['ocjena'])) $ocjena = $_POST['ocjena'];
-			if(isset($_POST['komentar'])) $komentar = $_POST['komentar'];
+			if(isset($_POST['ocjena']) && $_POST['ocjena'] !== 0 && 
+					isset($_POST['komentar']) && $_POST['komentar'] !== 'Ovdje napišite komentar.')
+			{
+				$ocjena = ' '; $komentar = ' ';
+				if(isset($_POST['ocjena'])) $ocjena = $_POST['ocjena'];
+				if(isset($_POST['komentar'])) $komentar = $_POST['komentar'];
 
-			$ss = new SmjestajService();
+				$ss = new SmjestajService();
 
-			$ss->dodajKomentar($ocjena, $komentar);
+				$ss->dodajKomentar($ocjena, $komentar);
+			}
 
 			$this->check_details();
-
-			//unset($_SESSION['detalji']);
-			//unset($_SESSION['id_hotela']);
 		}
 	}
 
