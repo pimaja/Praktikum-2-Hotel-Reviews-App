@@ -1,14 +1,17 @@
 <?php require_once __SITE_PATH . '/view/_header.php';  ?>
+<link rel="stylesheet" href="<?php echo __SITE_URL;?>/css/style2.css">
 
 <form method="post" action="<?php echo __SITE_URL; ?>/index.php?rt=users/check_odabir">
 <br />
-<input type="radio" name="odabir" value = "Amsterdam"> Amsterdam <br />
-<input type="radio" name="odabir" value = "Atena"> Atena <br />
-<input type="radio" name="odabir" value = "Berlin"> Berlin <br />
-<input type="radio" name="odabir" value = "Lisabon"> Lisabon <br />
-<input type="radio" name="odabir" value = "Moskva"> Moskva <br />
-<input type="radio" name="odabir" value = "Pariz"> Pariz <br />
-<input type="radio" name="odabir" value = "Prag"> Prag <br />
+<big>
+<input type="radio" name="odabir" value = "Amsterdam" class="big"> Amsterdam <br />
+<input type="radio" name="odabir" value = "Atena" class="big"> Atena <br />
+<input type="radio" name="odabir" value = "Berlin" class="big"> Berlin <br />
+<input type="radio" name="odabir" value = "Lisabon" class="big"> Lisabon <br />
+<input type="radio" name="odabir" value = "Moskva" class="big"> Moskva <br />
+<input type="radio" name="odabir" value = "Pariz" class="big"> Pariz <br />
+<input type="radio" name="odabir" value = "Prag" class="big"> Prag <br />
+</big>
 <br />
 <button type="submit" name="button">Dalje</button><br /><br />
 <button type="submit" name="odlogiraj">Odlogiraj se</button>

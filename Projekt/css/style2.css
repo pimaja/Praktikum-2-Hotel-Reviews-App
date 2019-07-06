@@ -1,0 +1,9 @@
+body{
+  background-image: url("bckg.jpg");
+  background-repeat: no-repeat;
+  background-size: cover;
+  font-size: 18px;
+  margin-left: 4%;
+}
+
+#mapa { width: 800px; height: 600px; }

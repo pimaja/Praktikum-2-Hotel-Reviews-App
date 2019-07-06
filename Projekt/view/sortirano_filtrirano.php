@@ -1,4 +1,5 @@
 <?php require_once __SITE_PATH . '/view/_header.php';  ?>
+<link rel="stylesheet" href="<?php echo __SITE_URL;?>/css/style2.css">
 <h>Filtri: </h><br />
 <?php foreach($filtri as $var)
           echo $var.' <br />';

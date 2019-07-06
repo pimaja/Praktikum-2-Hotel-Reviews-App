@@ -1,16 +1,20 @@
 <?php require_once __SITE_PATH . '/view/_header.php';  ?>
+<link rel="stylesheet" href="<?php echo __SITE_URL;?>/css/style2.css">
 
 
 <p>Možete odabrati više kriterija sortiranja i više kriterija za filter. Ako ne odaberete ništa od navedenog ispisat će Vam se svi hoteli u tom gradu.</p>
 <form method="post" action="<?php echo __SITE_URL; ?>/index.php?rt=users/check_sort_filt">
 <h2>Odaberite kriterij/e po kojima želite sortirati:</h2>
+<t1>
 <input type="checkbox" name="sort[]" value = "cijena_po_osobi"> Cijena <br />
 <input type="checkbox" name="sort[]" value = "udaljenost_od_centra"> Udaljenost od centra <br />
 <input type="checkbox" name="sort[]" value = "broj_osoba"> Broj osoba u sobi <br />
 <input type="checkbox" name="sort[]" value = "ocjena"> Ocjena <br />
 <input type="checkbox" name="sort[]" value = "broj_zvjezdica"> Broj zvjezdica <br />
+</t1>
 <br />
 <h2>Odaberite kriterij/e po kojima želite filtrirati:</h2>
+<t1>
 <input type="checkbox" name="filter[]" value = "cijena_po_osobi"> Maksimalna cijena <input type="text" name="cijena"> kn <br />
 <input type="checkbox" name="filter[]" value = "udaljenost_od_centra"> Udaljenost od centra najviše <input type="text" name="udaljenost"> km <br />
 <input type="checkbox" name="filter[]" value = "broj_osoba"> Broj osoba u sobi <input type="text" name="osobe"> <br />
@@ -22,6 +26,7 @@
 <input type="checkbox" name="filter[]" value = "ocjena"> Minimalna ocjena <input type="text" name="ocjena"> (1-10) <br />
 <input type="checkbox" name="filter[]" value = "broj_zvjezdica"> Minimalni broj zvjezdica <input type="text" name="zvjezdice"> (1-5) <br />
 <input type="checkbox" name="filter[]" value = "vlastita_kupaonica"> Obvezna kupaonica<br />
+</t1>
 <br />
 <button type="submit" name="button">Dalje</button><br /><br />
 <button type="submit" name="natrag">Natrag</button><br /><br />
