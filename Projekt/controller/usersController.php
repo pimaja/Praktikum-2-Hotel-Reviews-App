@@ -159,7 +159,7 @@ class UsersController extends BaseController
 				{
 					if($_SESSION['filter'][$i] === 'cijena_po_osobi' && isset($_SESSION['cijena']))
 					{
-						$ss3->applyFilterCijena($polje_polja_hotela, $_POST['cijena']);
+						$ss3->applyFilterCijena($polje_polja_hotela, $_SESSION['cijena']);
 						array_push($filtri, 'cijena po osobi po noćenju najviše: '.$_SESSION['cijena']);
 					}
 					if($_SESSION['filter'][$i] === 'udaljenost_od_centra' && isset($_SESSION['udaljenost']))
