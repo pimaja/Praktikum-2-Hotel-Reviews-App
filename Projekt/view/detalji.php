@@ -30,7 +30,7 @@
   <textarea name="komentar" rows="10" cols="50">
     Ovdje napišite komentar.
   </textarea><br />
-<button type="submit" name="komentar">Dodaj komentar</button><br /><br />
+<button type="submit" name="komentar_gumb">Dodaj komentar</button><br /><br />
 
 <br /><br />
 

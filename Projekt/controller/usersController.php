@@ -316,16 +316,26 @@ class UsersController extends BaseController
 		if(isset($_POST['natrag']))
 		{
 			unset($_POST['natrag']);
+			unset($_SESSION['detalji']);
+			unset($_SESSION['id_hotela']);
 			$this->check_sort_filt();
 			exit();
 		}
 
-		if(isset($_POST['komentar']))
+		if(isset($_POST['komentar_gumb']) && (isset($_POST['ocjena']) || isset($_POST['komentar'])))
 		{
-			//Tu sad jos dodat komentar u bazu i prebacit opet
-			//na fju $this->check_details(); da se ispise i novi komentar...
-			//IL TO SPADA POD KOMUNIKACIJU PA ĆEMO TO S JAVASCRIPTOM, lako se dopiše
-			//ovo ako ćemo s php...
+			$ocjena = ' '; $komentar = ' ';
+			if(isset($_POST['ocjena'])) $ocjena = $_POST['ocjena'];
+			if(isset($_POST['komentar'])) $komentar = $_POST['komentar'];
+
+			$ss = new SmjestajService();
+
+			$ss->dodajKomentar($ocjena, $komentar);
+
+			$this->check_details();
+
+			//unset($_SESSION['detalji']);
+			//unset($_SESSION['id_hotela']);
 		}
 	}
 

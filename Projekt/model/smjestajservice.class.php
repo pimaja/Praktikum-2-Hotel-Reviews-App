@@ -163,6 +163,40 @@ class SmjestajService
 	 return $arr;
  }
 
+ function getIdByNameAndSurname( $name, $surname )
+ {
+	 try
+	 {
+		 $db = DB::getConnection();
+		 $st = $db->prepare( 'SELECT id FROM projekt_korisnici WHERE name=:name AND surname=:surname' );
+		 $st->execute( array( 'name' => $name , 'surname' => $surname ) );
+	 }
+	 catch( PDOException $e ) { exit( 'PDO error ' . $e->getMessage() ); }
+
+	 $row = $st->fetch();
+	 if( $row === false )
+		 return null;
+	 else
+		 return $row['id'];
+ }
+
+ function dodajKomentar($ocjena, $komentar)
+ {
+	 $id_hotela = $_SESSION['id_hotela'];
+	 $korisnik = explode(',' , $_SESSION['login']);
+	 $id_user = $this->getIdByNameAndSurname($korisnik[0],$korisnik[1]);
+	 try
+	 {
+		 $db = DB::getConnection();
+		 $st = $db->prepare( 'INSERT INTO projekt_ocjene(id_user, id_hotela, ocjena_korisnika, komentar) VALUES ' .
+						 '(:id_user, :id_hotela, :ocjena, :komentar)' );
+		 $st->execute( array( 'id_user' => $id_user, 'id_hotela'=>$id_hotela,
+						 'ocjena' => $ocjena, 'komentar' => $komentar ) );
+	 }
+	 catch( PDOException $e ) { exit( 'PDO error ' . $e->getMessage() ); }
+ }
+
+
  //za razliku od prijasnjih funkcija ova je kompliciranija i samo ime
  //ne opisuje dovoljno sto funkcija radi
 	function getHotelsByNameOrderBy( $ime_grada, $kriterij )
