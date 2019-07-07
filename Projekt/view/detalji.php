@@ -8,13 +8,33 @@
 
 <h3>Ponuđene sobe: </h3>
 <?php if(count($hotel->sobe)!==0) { ?>
-<table><tr><th>Broj osoba</th><th>Tip kreveta</th><th>Vlastita kupaonica</th><th>Cijena po osobi</th></tr>
+<table><tr><th>Broj osoba</th><th>Tip kreveta</th><th>Vlastita kupaonica</th><th>Cijena po osobi za 1 noćenje</th>
+<th>Izračunaj po sobi za 1 noćenje</th>
+<th>Izračunaj za željeni broj noćenja po sobi<br/>Unesi broj dana <input type="text" id="broj" size="3"/></th></tr>
 <?php foreach($hotel->sobe as $soba)
 { ?>
 <tr><td><?php echo $soba->broj_osoba; ?></td><td><?php echo $soba->tip_kreveta; ?></td>
-  <td><?php echo $soba->vlastita_kupaonica; ?></td><td><?php echo $soba->cijena_po_osobi; ?></td></tr>
+  <td><?php echo $soba->vlastita_kupaonica; ?></td><td><?php echo $soba->cijena_po_osobi; ?></td>
+  <td><button class='tablica_gumb' id=<?php echo "1noc".",".$soba->broj_osoba .",".$soba->cijena_po_osobi;?>>Izračunaj!</button></td>
+  <td><button class='tablica_gumb' id=<?php echo "nnoc".",".$soba->broj_osoba .",".$soba->cijena_po_osobi;?>>Izračunaj!</button></td>
+</tr>
 <?php } ?>
 </table> <?php } else echo 'Trenutno nema ponuđenih soba'; ?>
+
+<script>
+//obradi izračunavanja, iznos ispisi u alert box
+$(document).ready(function(){
+	$("button").on("click", function(){
+		var id=this.id;
+		if(id.split(",")[0]==="1noc")
+			alert("Cijena po sobi po noćenju iznosi:  "+id.split(",")[1]*id.split(",")[2]+" kn.");
+		else if(id.split(",")[0]==="nnoc"){
+			brnoc=$("#broj").val();
+			alert("Cijena za "+brnoc+" nocenja za cijelu sobu iznosi:  "+id.split(",")[1]*id.split(",")[2]*brnoc+" kn.");
+		}
+	});
+});
+</script>
 
 
 <h3>Komentari i ocjene: </h3>
@@ -109,7 +129,9 @@ $( document ).ready( function()
 <form method="post" action="<?php echo __SITE_URL; ?>/index.php?rt=users/check_comments">
   Ocjena: <input type="text" name="ocjena" /><br />
   Opis: <br />
-  <textarea name="komentar" rows="10" cols="50">Ovdje napišite komentar.</textarea><br />
+  <textarea name="komentar" rows="10" cols="50">
+    Ovdje napišite komentar.
+  </textarea><br />
 <button class='tablica_gumb' type="submit" name="komentar_gumb">Dodaj komentar</button><br /><br />
 
 <br /><br />
