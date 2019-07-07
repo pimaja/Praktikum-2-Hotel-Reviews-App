@@ -15,16 +15,16 @@
 <br />
 <h3>Odaberite kriterij/e po kojima želite filtrirati:</h3>
 <t1>
-<input type="checkbox" name="filter[]" value = "cijena_po_osobi"> Maksimalna cijena <input type="text" name="cijena"> kn <br />
-<input type="checkbox" name="filter[]" value = "udaljenost_od_centra"> Udaljenost od centra najviše <input type="text" name="udaljenost"> km <br />
-<input type="checkbox" name="filter[]" value = "broj_osoba"> Broj osoba u sobi <input type="text" name="osobe"> <br />
+<input type="checkbox" name="filter[]" value = "cijena_po_osobi"> Maksimalna cijena <input type="text" name="cijena" size="6"> kn <br />
+<input type="checkbox" name="filter[]" value = "udaljenost_od_centra"> Udaljenost od centra najviše <input type="text" name="udaljenost" size="3"> km <br />
+<input type="checkbox" name="filter[]" value = "broj_osoba"> Broj osoba u sobi <input type="text" name="osobe" size="3"> <br />
 <input type="checkbox" name="filter[]" value = "tip_kreveta"> Tip kreveta u sobi
-<dd> broj <input type="text" name="bracni"> bracnih </dd>
-<dd> broj <input type="text" name="odvojeni"> odvojenih </dd>
-<dd> broj <input type="text" name="na_kat"> na kat </dd>
+<dd> broj <input type="text" name="bracni" size="3"> bracnih </dd>
+<dd> broj <input type="text" name="odvojeni" size="3"> odvojenih </dd>
+<dd> broj <input type="text" name="na_kat" size="3"> na kat </dd>
 <br />
-<input type="checkbox" name="filter[]" value = "ocjena"> Minimalna ocjena <input type="text" name="ocjena"> (1-10) <br />
-<input type="checkbox" name="filter[]" value = "broj_zvjezdica"> Minimalni broj zvjezdica <input type="text" name="zvjezdice"> (1-5) <br />
+<input type="checkbox" name="filter[]" value = "ocjena"> Minimalna ocjena <input type="text" name="ocjena" size="3"> (1-10) <br />
+<input type="checkbox" name="filter[]" value = "broj_zvjezdica"> Minimalni broj zvjezdica <input type="text" name="zvjezdice" size="3"> (1-5) <br />
 <input type="checkbox" name="filter[]" value = "vlastita_kupaonica"> Obvezna kupaonica<br />
 </t1>
 <br />

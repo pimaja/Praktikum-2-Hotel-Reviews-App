@@ -26,7 +26,8 @@ class UsersController extends BaseController
 	public function check_login()
 	{
 		$ss = new SmjestajService();
-		if(isset($_POST['ime'], $_POST['prezime']) && $_POST['ime'] !=='' && $_POST['prezime']!=='')
+		if(isset($_POST['ime'], $_POST['prezime']) && !preg_match('/^[a-zA-Z\s-]{1, 20}/',$_POST['ime']) 
+					&& !preg_match('/^[a-zA-Z\s-]{1, 20}/',$_POST['prezime']))
 			$lozinka = $ss->getPasswordByNameAndSurname( $_POST['ime'], $_POST['prezime'] );
 		if(isset( $_POST['pass'] ))
 			if(password_verify($_POST['pass'], $lozinka))
@@ -45,8 +46,9 @@ class UsersController extends BaseController
   public function check_register()
 	{
 		if(isset($_POST['ime']) && isset($_POST['prezime']) && isset($_POST['pass']) && 
-				isset($_POST['pass2']) && $_POST['ime'] !=='' && $_POST['prezime'] !=='' 
-				&& $_POST['pass'] !=='' && $_POST['pass2'] !=='' && $_POST['pass'] === $_POST['pass2'] )
+				isset($_POST['pass2']) && !preg_match('/^[a-zA-Z0-9]{1, 20}/', $_POST['pass']) && !preg_match('/^[a-zA-Z0-9]{1, 20}/', $_POST['pass2']) 
+				&& !preg_match('/^[a-zA-Z\s-]{1, 20}/',$_POST['ime']) && !preg_match('/^[a-zA-Z\s-]{1, 20}/',$_POST['prezime']) && $_POST['ime']!==''
+				&& $_POST['prezime']!=='' && $_POST['pass']!=='' && $_POST['pass2']!=='' && $_POST['pass'] === $_POST['pass2'] )
 		{
 			$ss2 = new SmjestajService();
 			$ss2->dodajUsera($_POST['ime'], $_POST['prezime'], $_POST['pass']);
@@ -109,21 +111,21 @@ class UsersController extends BaseController
 			$_SESSION['sort'] = $_POST['sort'];
 		if(isset($_POST['filter']))
 			$_SESSION['filter'] = $_POST['filter'];
-		if(isset($_POST['cijena']))
+		if(isset($_POST['cijena']) && preg_match('/^-?(?:\d+|\d*\.\d+)$/', $_POST['cijena']))
 			$_SESSION['cijena'] = $_POST['cijena'];
-		if(isset($_POST['udaljenost']))
+		if(isset($_POST['udaljenost']) && preg_match('/^-?(?:\d+|\d*\.\d+)$/', $_POST['udaljenost']))
 			$_SESSION['udaljenost'] = $_POST['udaljenost'];
-		if(isset($_POST['osobe']))
+		if(isset($_POST['osobe']) && !preg_match('/^[0-9]{1, 20}/', $_POST['osobe']) && $_POST['osobe']!=='')
 			$_SESSION['osobe'] = $_POST['osobe'];
-		if(isset($_POST['bracni']))
+		if(isset($_POST['bracni']) && !preg_match('/^[0-9]{1, 10}/', $_POST['bracni']))
 			$_SESSION['bracni'] = $_POST['bracni'];
-		if(isset($_POST['odvojeni']))
+		if(isset($_POST['odvojeni']) && !preg_match('/^[0-9]{1, 10}/', $_POST['odvojeni']))
 			$_SESSION['odvojeni'] = $_POST['odvojeni'];
-		if(isset($_POST['na_kat']))
+		if(isset($_POST['na_kat']) && !preg_match('/^[0-9]{1, 10}/', $_POST['na_kat']))
 			$_SESSION['na_kat'] = $_POST['na_kat'];
-		if(isset($_POST['ocjena']))
+		if(isset($_POST['ocjena']) && preg_match('/^-?(?:\d+|\d*\.\d+)$/', $_POST['ocjena']))
 			$_SESSION['ocjena'] = $_POST['ocjena'];
-		if(isset($_POST['zvjezdice']))
+		if(isset($_POST['zvjezdice']) && preg_match('/^[1-5]/', $_POST['zvjezdice']))
 			$_SESSION['zvjezdice'] = $_POST['zvjezdice'];
 
 		$polje_polja_hotela= array();
@@ -174,7 +176,7 @@ class UsersController extends BaseController
 						$ss3->applyFilterOsobe($polje_polja_hotela, $_SESSION['osobe']);
 						array_push($filtri, 'broj osoba: '.$_SESSION['osobe']);
 					}
-					if($_SESSION['filter'][$i] === 'tip_kreveta' && (isset($_POST['bracni'])
+					if($_SESSION['filter'][$i] === 'tip_kreveta' && (isset($_SESSION['bracni'])
 					|| isset($_SESSION['odvojeni']) || isset($_SESSION['na_kat'])))
 					{
 						//punimo niz kreveti s informacijama o broju i vrsti kreveta koje korisnik hoće
@@ -296,13 +298,16 @@ class UsersController extends BaseController
 			exit();
 		}
 		//makni sessione nastale na trenutnoj stranici i vrati se na prethodnu
+		//micu se i sessioni koji sadrze kriterije sorta i filtra jer ako ne odemo na
+		//stranicu s detaljima onda se vraćamo na stranicu di odabiremo kriterije
+		//kako bi imali samo nove kriterije koje smo dobili u POST-u treba maknuti stare sessione
 		if(isset($_POST['natrag']))
 		{
 			$this->registry->template->title = 'Odaberite kako želite da Vam hoteli budu sortirani i filtrirani';
 			$this->registry->template->show( 'sortiraj_filtriraj' );
 			unset($_SESSION['detalji']);
 			unset($_SESSION['id_hotela']);
-			unset(	$_SESSION['sort']); unset($_SESSION['filter']);
+			unset($_SESSION['sort']); unset($_SESSION['filter']);
 			unset($_SESSION['cijena']); unset($_SESSION['udaljenost']);
 			unset($_SESSION['osobe']); unset($_SESSION['bracni']);
 			unset($_SESSION['odvojeni']); unset($_SESSION['na_kat']);
@@ -316,6 +321,7 @@ class UsersController extends BaseController
 			foreach($polje_hotela as $hotel)
 			{
 				//session je tu ako se vracamo sa neke stranice natrag na ovu
+				//tj. kad se vracamo na istu nakon dodavanja komentara
 				if((isset($_POST['detalji']) && $_POST['detalji'] === $hotel->ime_hotela) ||
 				(isset($_SESSION['detalji']) && $_SESSION['detalji'] === $hotel->ime_hotela))
 				{
@@ -339,7 +345,7 @@ class UsersController extends BaseController
 			$this->odlogiraj();
 			exit();
 		}
-
+		//natrag na liste sortiranih i fitlriranih hotela
 		if(isset($_POST['natrag']))
 		{
 			unset($_POST['natrag']);
@@ -349,14 +355,14 @@ class UsersController extends BaseController
 			exit();
 		}
 
-		if(isset($_POST['komentar_gumb']) && (isset($_POST['ocjena']) || isset($_POST['komentar'])))
+		if(isset($_POST['komentar_gumb']))
 		{
-			if(isset($_POST['ocjena']) && $_POST['ocjena'] !== 0 && 
+			if(isset($_POST['ocjena']) && preg_match('/^-?(?:\d+|\d*\.\d+)$/', $_POST['ocjena']) && $_POST['ocjena']!=='' && 
 					isset($_POST['komentar']) && $_POST['komentar'] !== 'Ovdje napišite komentar.')
 			{
 				$ocjena = ' '; $komentar = ' ';
-				if(isset($_POST['ocjena'])) $ocjena = $_POST['ocjena'];
-				if(isset($_POST['komentar'])) $komentar = $_POST['komentar'];
+				$ocjena = $_POST['ocjena'];
+				$komentar = $_POST['komentar'];
 
 				$ss = new SmjestajService();
 
