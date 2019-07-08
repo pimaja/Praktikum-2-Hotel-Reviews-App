@@ -30,7 +30,8 @@ $(document).ready(function(){
 			alert("Cijena po sobi po noćenju iznosi:  "+id.split(",")[1]*id.split(",")[2]+" kn.");
 		else if(id.split(",")[0]==="nnoc"){
 			brnoc=$("#broj").val();
-			alert("Cijena za "+brnoc+" nocenja za cijelu sobu iznosi:  "+id.split(",")[1]*id.split(",")[2]*brnoc+" kn.");
+			if (brnoc>0)
+				alert("Cijena za "+brnoc+" nocenja za cijelu sobu iznosi:  "+id.split(",")[1]*id.split(",")[2]*brnoc+" kn.");
 		}
 	});
 });
