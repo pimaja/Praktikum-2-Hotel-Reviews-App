@@ -28,18 +28,26 @@ class UsersController extends BaseController
 		$ss = new SmjestajService();
 		if(isset($_POST['ime'], $_POST['prezime']) && !preg_match('/^[a-zA-Z\s-]{1, 20}/',$_POST['ime']) 
 					&& !preg_match('/^[a-zA-Z\s-]{1, 20}/',$_POST['prezime']))
-			$lozinka = $ss->getPasswordByNameAndSurname( $_POST['ime'], $_POST['prezime'] );
+			$lozinke = $ss->getPasswordByNameAndSurname( $_POST['ime'], $_POST['prezime'] ); //više ih je za slučaj da ima više korisnika s istim
+																							//imenom i prezimenom, sifra je  onda npr.'perinasifra2'
 		if(isset( $_POST['pass'] ))
-			if(password_verify($_POST['pass'], $lozinka))
+		{
+			foreach($lozinke as $lozinka)
 			{
-				session_start();
-				$secret_word = 'racunarski praktikum 2!!!';
-				//spremi u session korisnika koji se sad ulogirao
-				$_SESSION['login'] = $_POST['ime'] . ','. $_POST['prezime'] . ',' . md5( $_POST['ime'] . $secret_word );;
-				header( 'Location: ' . __SITE_URL . '/index.php?rt=users/odabir');
-				exit();
+				if(password_verify($_POST['pass'], $lozinka))
+				{
+					session_start();
+					$secret_word = 'racunarski praktikum 2!!!';
+					//spremi u session korisnika koji se sad ulogirao
+					$_SESSION['login'] = $_POST['ime'] . ','. $_POST['prezime'] . ',' . md5( $_POST['ime'] . $secret_word );;
+					header( 'Location: ' . __SITE_URL . '/index.php?rt=users/odabir');
+					exit();
+				}
 			}
-			else $this->odlogiraj();
+			//proslo je kroz petlju po lozinkama i nije se dogodio exit tj. nema te osobe s tim imenom, prezimenom
+			//i šifrom, onda ne valja log in i ide na odlogiraj
+			$this->odlogiraj();
+		}
 		else $this->odlogiraj();
 	}
 
@@ -51,6 +59,17 @@ class UsersController extends BaseController
 				&& $_POST['prezime']!=='' && $_POST['pass']!=='' && $_POST['pass2']!=='' && $_POST['pass'] === $_POST['pass2'] )
 		{
 			$ss2 = new SmjestajService();
+			$lozinke = $ss2->getPasswordByNameAndSurname( $_POST['ime'], $_POST['prezime'] );
+			//neće uć u petlju ako nemamo osobu s istim imenom i prezimenom
+			foreach($lozinke as $lozinka)
+			{
+				//Ako imamo već osobu s istim imenom, prezimenom pa čak i lozinkom, odi na odlogiraj
+				if(password_verify($_POST['pass'], $lozinka))
+				{
+					$this->odlogiraj();
+					exit();
+				}
+			}
 			$ss2->dodajUsera($_POST['ime'], $_POST['prezime'], $_POST['pass']);
 			session_start();
 			$secret_word = 'racunarski praktikum 2!!!';

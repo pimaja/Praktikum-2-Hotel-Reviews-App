@@ -11,12 +11,14 @@ class SmjestajService
 			$st->execute( array( 'name' => $name , 'surname' => $surname ) );
 		}
 		catch( PDOException $e ) { exit( 'PDO error ' . $e->getMessage() ); }
-
-		$row = $st->fetch();
-		if( $row === false )
-			return null;
-		else
-			return $row['password'];
+		
+		$lozinke = array();
+		while( $row = $st->fetch() )
+		{
+			$lozinke[] = $row['password'];
+		}
+		
+		return $lozinke;
 	}
 
  //postavi novog korisnika u bazu
