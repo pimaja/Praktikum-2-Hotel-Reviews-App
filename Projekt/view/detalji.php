@@ -10,7 +10,8 @@
 <?php if(count($hotel->sobe)!==0) { ?>
 <table><tr><th>Broj osoba</th><th>Tip kreveta</th><th>Vlastita kupaonica</th><th>Cijena po osobi za 1 noćenje</th>
 <th>Izračunaj po sobi za 1 noćenje</th>
-<th>Izračunaj za željeni broj noćenja po sobi<br/>Unesi broj dana <input type="text" id="broj" size="3"/></th></tr>
+<th>Izračunaj za željeni broj noćenja i željeni broj osoba<br/>Unesi broj dana <input type="text" id="broj" size="3"/> 
+i broj osoba <input type="text" id="brojos" size="3"/></th></tr>
 <?php foreach($hotel->sobe as $soba)
 { ?>
 <tr><td><?php echo $soba->broj_osoba; ?></td><td><?php echo $soba->tip_kreveta; ?></td>
@@ -30,8 +31,19 @@ $(document).ready(function(){
 			alert("Cijena po sobi po noćenju iznosi:  "+id.split(",")[1]*id.split(",")[2]+" kn.");
 		else if(id.split(",")[0]==="nnoc"){
 			brnoc=$("#broj").val();
-			if (brnoc>0)
-				alert("Cijena za "+brnoc+" nocenja za cijelu sobu iznosi:  "+id.split(",")[1]*id.split(",")[2]*brnoc+" kn.");
+			bros=$("#brojos").val();
+			if(bros>parseInt(id.split(",")[1]))
+				alert("U odabranu sobu ne može stati toliko ljudi.");
+			else{
+				if (brnoc>0){
+					if(bros>0)
+						alert("Cijena za "+brnoc+" nocenja za "+bros+" osobe iznosi:  "+bros*id.split(",")[2]*brnoc+" kn.");
+					else 
+						alert("Trebate upisati željeni broj osoba (broj veći od 0).");
+				}
+				else
+					alert("Trebate upisati željeni broj noćenja (broj veći od 0).");
+			}
 		}
 	});
 });
